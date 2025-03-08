@@ -1,0 +1,417 @@
+definitions:
+  models.CreatePollingResponse:
+    properties:
+      description:
+        type: string
+      end_date:
+        type: string
+      id:
+        type: integer
+      start_date:
+        type: string
+      status:
+        $ref: '#/definitions/models.Status'
+      title:
+        type: string
+    type: object
+  models.ErrorResponse:
+    properties:
+      error: {}
+      message:
+        type: string
+    type: object
+  models.PollsResponse:
+    properties:
+      description:
+        type: string
+      end_date:
+        type: string
+      id:
+        type: integer
+      start_date:
+        type: string
+      status:
+        $ref: '#/definitions/models.Status'
+      title:
+        type: string
+    type: object
+  models.ResponseWithData-array_models_PollsResponse:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/models.PollsResponse'
+        type: array
+      message:
+        type: string
+    type: object
+  models.ResponseWithData-models_CreatePollingResponse:
+    properties:
+      data:
+        $ref: '#/definitions/models.CreatePollingResponse'
+      message:
+        type: string
+    type: object
+  models.ResponseWithData-models_PollsResponse:
+    properties:
+      data:
+        $ref: '#/definitions/models.PollsResponse'
+      message:
+        type: string
+    type: object
+  models.ResponseWithData-models_UpdatePollingResponse:
+    properties:
+      data:
+        $ref: '#/definitions/models.UpdatePollingResponse'
+      message:
+        type: string
+    type: object
+  models.ResponseWithData-models_UserLoginResponse:
+    properties:
+      data:
+        $ref: '#/definitions/models.UserLoginResponse'
+      message:
+        type: string
+    type: object
+  models.ResponseWithData-models_UserRegisterResponse:
+    properties:
+      data:
+        $ref: '#/definitions/models.UserRegisterResponse'
+      message:
+        type: string
+    type: object
+  models.ResponseWithMessage:
+    properties:
+      message:
+        type: string
+    type: object
+  models.Status:
+    enum:
+    - active
+    - done
+    type: string
+    x-enum-varnames:
+    - Active
+    - Done
+  models.UpdatePollingResponse:
+    properties:
+      description:
+        type: string
+      end_date:
+        type: string
+      id:
+        type: integer
+      start_date:
+        type: string
+      status:
+        $ref: '#/definitions/models.Status'
+      title:
+        type: string
+    type: object
+  models.UserLoginResponse:
+    properties:
+      avatar:
+        type: string
+      email:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+      token:
+        type: string
+    type: object
+  models.UserRegisterResponse:
+    properties:
+      avatar:
+        type: string
+      email:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+    type: object
+  requests.CreatePolling:
+    type: object
+  requests.UpdatePolling:
+    type: object
+  requests.UserLogin:
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+    type: object
+  requests.UserRegister:
+    properties:
+      email:
+        type: string
+      name:
+        type: string
+      password:
+        type: string
+    type: object
+host: localhost:3000
+info:
+  contact:
+    email: me@rizkirmdhn.cloud
+    name: API Support
+  description: This is a sample server evote-be server
+  title: evote-be API
+  version: "1.0"
+paths:
+  /auth/login:
+    post:
+      consumes:
+      - application/json
+      description: Login user with email and password
+      parameters:
+      - description: User Login Data
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/requests.UserLogin'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success response
+          schema:
+            $ref: '#/definitions/models.ResponseWithData-models_UserLoginResponse'
+        "400":
+          description: Validation error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: Login user
+      tags:
+      - auth
+  /auth/register:
+    post:
+      consumes:
+      - application/json
+      description: Register a new user account with a unique email address.
+      parameters:
+      - description: User Registration Data
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/requests.UserRegister'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Success response
+          schema:
+            $ref: '#/definitions/models.ResponseWithData-models_UserRegisterResponse'
+        "400":
+          description: Validation error or email already taken
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: Register new user
+      tags:
+      - auth
+  /polls:
+    get:
+      consumes:
+      - application/json
+      description: Get all polls
+      parameters:
+      - description: Limit
+        in: query
+        name: limit
+        type: integer
+      - description: Offset
+        in: query
+        name: offset
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success response
+          schema:
+            $ref: '#/definitions/models.ResponseWithData-array_models_PollsResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Get all polls
+      tags:
+      - polls
+  /polls/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Show poll
+      parameters:
+      - description: Poll ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success response
+          schema:
+            $ref: '#/definitions/models.ResponseWithData-models_PollsResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: Poll not found
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Show poll
+      tags:
+      - polls
+  /polls/{id}/delete:
+    delete:
+      consumes:
+      - application/json
+      description: Delete poll
+      parameters:
+      - description: Poll ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success response
+          schema:
+            $ref: '#/definitions/models.ResponseWithMessage'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: Poll not found
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Delete poll
+      tags:
+      - polls
+  /polls/{id}/update:
+    put:
+      consumes:
+      - application/json
+      description: Update poll
+      parameters:
+      - description: Poll ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Poll Data
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/requests.UpdatePolling'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success response
+          schema:
+            $ref: '#/definitions/models.ResponseWithData-models_UpdatePollingResponse'
+        "400":
+          description: Validation error or title already taken
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: Poll not found
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Update poll
+      tags:
+      - polls
+  /polls/create:
+    post:
+      consumes:
+      - application/json
+      description: Create new poll
+      parameters:
+      - description: Poll Data
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/requests.CreatePolling'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Success response
+          schema:
+            $ref: '#/definitions/models.ResponseWithData-models_CreatePollingResponse'
+        "400":
+          description: Validation error or title already taken
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Store new poll
+      tags:
+      - polls
+securityDefinitions:
+  Bearer:
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"
