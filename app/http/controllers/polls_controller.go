@@ -4,6 +4,7 @@ import (
 	"evote-be/app/http/requests"
 	"evote-be/app/models"
 	"math"
+	"strconv"
 
 	"github.com/goravel/framework/contracts/http"
 	"github.com/goravel/framework/facades"
@@ -337,5 +338,78 @@ func (r *PollsController) Delete(ctx http.Context) http.Response {
 	// return response
 	return ctx.Response().Json(http.StatusOK, models.ResponseWithMessage{
 		Message: "Poll deleted successfully",
+	})
+}
+
+// Get all options of a poll
+// @Summary Get all options of a poll
+// @Description Get all options of a poll
+// @Tags Polls
+// @Accept json
+// @Produce json
+// @Security Bearer
+// @Param id path string true "Poll ID"
+// @Success 200 {object} models.ResponseWithData[models.CreateOptionsResponse] "Options found"
+// @Failure 401 {object} models.ErrorResponse "Unauthorized"
+// @Failure 404 {object} models.ErrorResponse "Poll not found"
+// @Router /polls/{id}/options [get]
+func (r *PollsController) GetPollOptions(ctx http.Context) http.Response {
+	// Get user from context
+	user, ok := ctx.Value("user").(models.User)
+	if !ok {
+		return ctx.Response().Json(http.StatusUnauthorized, models.ErrorResponse{
+			Message: "Unauthorized",
+			Errors:  "Invalid token",
+		})
+	}
+
+	// Get poll id
+	pollID := ctx.Request().Route("id")
+
+	// Check if poll_id is valid
+	id, err := strconv.ParseUint(pollID, 10, 64)
+	if err != nil {
+		return ctx.Response().Json(http.StatusBadRequest, models.ErrorResponse{
+			Message: "Validation error",
+			Errors:  "Invalid poll_id",
+		})
+	}
+
+	// Check if poll exists
+	var poll models.Polls
+	if err := facades.Orm().Query().Model(&poll).Where("id = ?", id).FirstOrFail(&poll); err != nil {
+		return ctx.Response().Json(http.StatusBadRequest, models.ErrorResponse{
+			Message: "upss, something went wrong",
+			Errors:  "poll not found",
+		})
+	}
+
+	// Check if user is the owner of the poll
+	if poll.UserID != user.ID {
+		return ctx.Response().Json(http.StatusUnauthorized, models.ErrorResponse{
+			Message: "Unauthorized",
+			Errors:  "You are not the owner of this poll",
+		})
+	}
+
+	// Get all options of the poll
+	var options []models.Options
+	if err := facades.Orm().Query().Model(&options).Where("poll_id = ?", id).Scan(&options); err != nil {
+		return ctx.Response().Json(http.StatusInternalServerError, models.ErrorResponse{
+			Message: "Failed to get options",
+			Errors:  err.Error(),
+		})
+	}
+
+	// Convert options to response
+	optResp := make([]models.CreateOptionsResponse, len(options))
+	for i, opt := range options {
+		optResp[i] = opt.ToResponse()
+	}
+
+	// Return response
+	return ctx.Response().Json(http.StatusOK, models.ResponseWithData[[]models.CreateOptionsResponse]{
+		Message: "Options found",
+		Data:    optResp,
 	})
 }

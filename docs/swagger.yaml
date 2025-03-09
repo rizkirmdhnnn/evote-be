@@ -505,6 +505,37 @@ paths:
       summary: Delete poll
       tags:
       - Polls
+  /polls/{id}/options:
+    get:
+      consumes:
+      - application/json
+      description: Get all options of a poll
+      parameters:
+      - description: Poll ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Options found
+          schema:
+            $ref: '#/definitions/models.ResponseWithData-models_CreateOptionsResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: Poll not found
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Get all options of a poll
+      tags:
+      - Polls
   /polls/{id}/update:
     put:
       consumes:
