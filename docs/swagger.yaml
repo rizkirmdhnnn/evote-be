@@ -193,7 +193,7 @@ paths:
             $ref: '#/definitions/models.ErrorResponse'
       summary: Login user
       tags:
-      - auth
+      - Auth
   /auth/register:
     post:
       consumes:
@@ -223,7 +223,7 @@ paths:
             $ref: '#/definitions/models.ErrorResponse'
       summary: Register new user
       tags:
-      - auth
+      - Auth
   /polls:
     get:
       consumes:
@@ -257,7 +257,7 @@ paths:
       - Bearer: []
       summary: Get all polls
       tags:
-      - polls
+      - Polls
   /polls/{id}:
     get:
       consumes:
@@ -292,7 +292,7 @@ paths:
       - Bearer: []
       summary: Show poll
       tags:
-      - polls
+      - Polls
   /polls/{id}/delete:
     delete:
       consumes:
@@ -327,7 +327,7 @@ paths:
       - Bearer: []
       summary: Delete poll
       tags:
-      - polls
+      - Polls
   /polls/{id}/update:
     put:
       consumes:
@@ -372,7 +372,7 @@ paths:
       - Bearer: []
       summary: Update poll
       tags:
-      - polls
+      - Polls
   /polls/create:
     post:
       consumes:
@@ -408,7 +408,7 @@ paths:
       - Bearer: []
       summary: Store new poll
       tags:
-      - polls
+      - Polls
 securityDefinitions:
   Bearer:
     in: header

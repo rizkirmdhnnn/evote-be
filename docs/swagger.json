@@ -21,7 +21,7 @@
                     "application/json"
                 ],
                 "tags": [
-                    "auth"
+                    "Auth"
                 ],
                 "summary": "Login user",
                 "parameters": [
@@ -73,7 +73,7 @@
                     "application/json"
                 ],
                 "tags": [
-                    "auth"
+                    "Auth"
                 ],
                 "summary": "Register new user",
                 "parameters": [
@@ -124,7 +124,7 @@
                     "application/json"
                 ],
                 "tags": [
-                    "polls"
+                    "Polls"
                 ],
                 "summary": "Get all polls",
                 "parameters": [
@@ -178,7 +178,7 @@
                     "application/json"
                 ],
                 "tags": [
-                    "polls"
+                    "Polls"
                 ],
                 "summary": "Store new poll",
                 "parameters": [
@@ -235,7 +235,7 @@
                     "application/json"
                 ],
                 "tags": [
-                    "polls"
+                    "Polls"
                 ],
                 "summary": "Show poll",
                 "parameters": [
@@ -290,7 +290,7 @@
                     "application/json"
                 ],
                 "tags": [
-                    "polls"
+                    "Polls"
                 ],
                 "summary": "Delete poll",
                 "parameters": [
@@ -345,7 +345,7 @@
                     "application/json"
                 ],
                 "tags": [
-                    "polls"
+                    "Polls"
                 ],
                 "summary": "Update poll",
                 "parameters": [

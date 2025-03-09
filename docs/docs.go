@@ -28,7 +28,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "auth"
+                    "Auth"
                 ],
                 "summary": "Login user",
                 "parameters": [
@@ -80,7 +80,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "auth"
+                    "Auth"
                 ],
                 "summary": "Register new user",
                 "parameters": [
@@ -131,7 +131,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "polls"
+                    "Polls"
                 ],
                 "summary": "Get all polls",
                 "parameters": [
@@ -185,7 +185,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "polls"
+                    "Polls"
                 ],
                 "summary": "Store new poll",
                 "parameters": [
@@ -242,7 +242,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "polls"
+                    "Polls"
                 ],
                 "summary": "Show poll",
                 "parameters": [
@@ -297,7 +297,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "polls"
+                    "Polls"
                 ],
                 "summary": "Delete poll",
                 "parameters": [
@@ -352,7 +352,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "polls"
+                    "Polls"
                 ],
                 "summary": "Update poll",
                 "parameters": [

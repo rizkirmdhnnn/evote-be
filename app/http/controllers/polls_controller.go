@@ -23,7 +23,7 @@ func NewPollsController() *PollsController {
 //
 // @Summary     Get all polls
 // @Description Get all polls
-// @Tags        polls
+// @Tags        Polls
 // @Accept      json
 // @Produce     json
 // @Security  Bearer
@@ -89,7 +89,7 @@ func (r *PollsController) Index(ctx http.Context) http.Response {
 //
 // @Summary     Store new poll
 // @Description Create new poll
-// @Tags        polls
+// @Tags        Polls
 // @Accept      json
 // @Produce     json
 // @Security  Bearer
@@ -160,7 +160,7 @@ func (r *PollsController) Store(ctx http.Context) http.Response {
 // Show poll
 // @Summary     Show poll
 // @Description Show poll
-// @Tags        polls
+// @Tags        Polls
 // @Accept      json
 // @Produce     json
 // @Security  Bearer
@@ -202,7 +202,7 @@ func (r *PollsController) Show(ctx http.Context) http.Response {
 // Update poll
 // @Summary     Update poll
 // @Description Update poll
-// @Tags        polls
+// @Tags        Polls
 // @Accept      json
 // @Produce     json
 // @Security  Bearer
@@ -294,7 +294,7 @@ func (r *PollsController) Update(ctx http.Context) http.Response {
 // Delete poll
 // @Summary     Delete poll
 // @Description Delete poll
-// @Tags        polls
+// @Tags        Polls
 // @Accept      json
 // @Produce     json
 // @Security  Bearer
