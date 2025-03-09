@@ -881,11 +881,13 @@ const docTemplate = `{
                 },
                 "end_date": {
                     "type": "string",
-                    "format": "date-time"
+                    "format": "date-time",
+                    "example": "2022-01-01 00:00"
                 },
                 "start_date": {
                     "type": "string",
-                    "format": "date-time"
+                    "format": "date-time",
+                    "example": "2022-01-01 00:00"
                 },
                 "status": {
                     "description": "testing:\n* active - Active, can be voted\n* done - Done, can't be voted",

@@ -11,8 +11,8 @@ import (
 type CreatePolling struct {
 	Title       string    `json:"title"`
 	Description string    `json:"description"`
-	StartDate   time.Time `json:"start_date" swaggertype:"string" format:"date-time"`
-	EndDate     time.Time `json:"end_date" swaggertype:"string" format:"date-time"`
+	StartDate   time.Time `json:"start_date" swaggertype:"string" example:"2022-01-01 00:00" format:"date-time"`
+	EndDate     time.Time `json:"end_date" swaggertype:"string" example:"2022-01-01 00:00" format:"date-time"`
 	// testing:
 	// * active - Active, can be voted
 	// * done - Done, can't be voted
@@ -59,12 +59,13 @@ func (r *CreatePolling) PrepareForValidation(ctx http.Context, data validation.D
 	}
 
 	// Parse start_date and end_date without changing timezone
-	startDate, err := time.Parse(time.RFC3339, startDateStr.(string))
+	layout := "2006-01-02 15:04"
+	startDate, err := time.Parse(layout, startDateStr.(string))
 	if err != nil {
 		return errors.New("invalid start_date format, use RFC3339 format")
 	}
 
-	endDate, err := time.Parse(time.RFC3339, endDateStr.(string))
+	endDate, err := time.Parse(layout, endDateStr.(string))
 	if err != nil {
 		return errors.New("invalid end_date format, use RFC3339 format")
 	}

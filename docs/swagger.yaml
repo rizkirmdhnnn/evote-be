@@ -167,9 +167,11 @@ definitions:
       description:
         type: string
       end_date:
+        example: 2022-01-01 00:00
         format: date-time
         type: string
       start_date:
+        example: 2022-01-01 00:00
         format: date-time
         type: string
       status:
