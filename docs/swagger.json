@@ -109,6 +109,170 @@
                 }
             }
         },
+        "/options/create": {
+            "post": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "Create a new option",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Options"
+                ],
+                "summary": "Create a new option",
+                "parameters": [
+                    {
+                        "description": "Option data",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/requests.CreateOption"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Option created",
+                        "schema": {
+                            "$ref": "#/definitions/models.ResponseWithData-models_CreateOptionsResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Validation error",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/options/{id}/delete": {
+            "delete": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "Delete an option",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Options"
+                ],
+                "summary": "Delete an option",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Option ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Option deleted",
+                        "schema": {
+                            "$ref": "#/definitions/models.ResponseWithMessage"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Option not found",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/options/{id}/update": {
+            "put": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "Update an option",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Options"
+                ],
+                "summary": "Update an option",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Option ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Option data",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/requests.UpdateOption"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Option updated",
+                        "schema": {
+                            "$ref": "#/definitions/models.ResponseWithData-models_CreateOptionsResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Validation error",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Option not found",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/polls": {
             "get": {
                 "security": [
@@ -402,6 +566,26 @@
         }
     },
     "definitions": {
+        "models.CreateOptionsResponse": {
+            "type": "object",
+            "properties": {
+                "avatar": {
+                    "type": "string"
+                },
+                "desc": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "votes_count": {
+                    "type": "integer"
+                }
+            }
+        },
         "models.CreatePollingResponse": {
             "type": "object",
             "properties": {
@@ -465,6 +649,17 @@
                     "items": {
                         "$ref": "#/definitions/models.PollsResponse"
                     }
+                },
+                "message": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.ResponseWithData-models_CreateOptionsResponse": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "$ref": "#/definitions/models.CreateOptionsResponse"
                 },
                 "message": {
                     "type": "string"
@@ -605,11 +800,86 @@
                 }
             }
         },
+        "requests.CreateOption": {
+            "type": "object",
+            "properties": {
+                "avatar": {
+                    "type": "string"
+                },
+                "desc": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "poll_id": {
+                    "type": "string"
+                }
+            }
+        },
         "requests.CreatePolling": {
-            "type": "object"
+            "type": "object",
+            "properties": {
+                "description": {
+                    "type": "string"
+                },
+                "end_date": {
+                    "type": "string",
+                    "format": "date-time"
+                },
+                "start_date": {
+                    "type": "string",
+                    "format": "date-time"
+                },
+                "status": {
+                    "description": "testing:\n* active - Active, can be voted\n* done - Done, can't be voted",
+                    "type": "string",
+                    "enum": [
+                        "active",
+                        "done"
+                    ]
+                },
+                "title": {
+                    "type": "string"
+                }
+            }
+        },
+        "requests.UpdateOption": {
+            "type": "object",
+            "properties": {
+                "avatar": {
+                    "type": "string"
+                },
+                "desc": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "poll_id": {
+                    "type": "string"
+                }
+            }
         },
         "requests.UpdatePolling": {
-            "type": "object"
+            "type": "object",
+            "properties": {
+                "description": {
+                    "type": "string"
+                },
+                "end_date": {
+                    "type": "string"
+                },
+                "start_date": {
+                    "type": "string"
+                },
+                "status": {
+                    "$ref": "#/definitions/models.Status"
+                },
+                "title": {
+                    "type": "string"
+                }
+            }
         },
         "requests.UserLogin": {
             "type": "object",

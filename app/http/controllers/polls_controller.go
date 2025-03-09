@@ -130,8 +130,8 @@ func (r *PollsController) Store(ctx http.Context) http.Response {
 		Title:       request.Title,
 		Description: request.Description,
 		Status:      models.Active,
-		StartDate:   request.StartDate.StdTime(),
-		EndDate:     request.EndDate.StdTime(),
+		StartDate:   request.StartDate,
+		EndDate:     request.EndDate,
 		UserID:      user.ID,
 	}
 
@@ -259,11 +259,11 @@ func (r *PollsController) Update(ctx http.Context) http.Response {
 	if request.Description != "" {
 		poll.Description = request.Description
 	}
-	if request.StartDate.StdTime().After(poll.StartDate) {
-		poll.StartDate = request.StartDate.StdTime()
+	if request.StartDate.After(poll.StartDate) {
+		poll.StartDate = request.StartDate
 	}
-	if request.EndDate.StdTime().After(poll.EndDate) {
-		poll.EndDate = request.EndDate.StdTime()
+	if request.EndDate.After(poll.EndDate) {
+		poll.EndDate = request.EndDate
 	}
 	if request.Status != "" {
 		poll.Status = request.Status

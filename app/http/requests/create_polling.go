@@ -4,16 +4,19 @@ import (
 	"errors"
 	"time"
 
-	"github.com/dromara/carbon/v2"
 	"github.com/goravel/framework/contracts/http"
 	"github.com/goravel/framework/contracts/validation"
 )
 
 type CreatePolling struct {
-	Title       string          `json:"title"`
-	Description string          `json:"description"`
-	StartDate   carbon.DateTime `json:"start_date"`
-	EndDate     carbon.DateTime `json:"end_date"`
+	Title       string    `json:"title"`
+	Description string    `json:"description"`
+	StartDate   time.Time `json:"start_date" swaggertype:"string" format:"date-time"`
+	EndDate     time.Time `json:"end_date" swaggertype:"string" format:"date-time"`
+	// testing:
+	// * active - Active, can be voted
+	// * done - Done, can't be voted
+	Status string `json:"status" swaggertype:"string" enums:"active,done"`
 }
 
 func (r *CreatePolling) Authorize(ctx http.Context) error {
@@ -43,7 +46,7 @@ func (r *CreatePolling) Attributes(ctx http.Context) map[string]string {
 }
 
 func (r *CreatePolling) PrepareForValidation(ctx http.Context, data validation.Data) error {
-	localNow := carbon.Now(time.Local.String())
+	localNow := time.Now()
 
 	// Check if start_date and end_date are provided
 	startDateStr, exists := data.Get("start_date")
@@ -55,21 +58,28 @@ func (r *CreatePolling) PrepareForValidation(ctx http.Context, data validation.D
 		return errors.New("end_date is required")
 	}
 
-	// Parse start_date dan end_date tanpa mengubah timezone
-	startDate := carbon.Parse(startDateStr.(string))
-	endDate := carbon.Parse(endDateStr.(string))
+	// Parse start_date and end_date without changing timezone
+	startDate, err := time.Parse(time.RFC3339, startDateStr.(string))
+	if err != nil {
+		return errors.New("invalid start_date format, use RFC3339 format")
+	}
 
-	// Simpan hasil parsing ke struct
-	r.StartDate.Carbon = startDate
-	r.EndDate.Carbon = endDate
+	endDate, err := time.Parse(time.RFC3339, endDateStr.(string))
+	if err != nil {
+		return errors.New("invalid end_date format, use RFC3339 format")
+	}
 
-	// Cek jika start_date lebih besar dari end_date
-	if startDate.StdTime().After(endDate.StdTime()) {
+	// Store parsed times to struct
+	r.StartDate = startDate
+	r.EndDate = endDate
+
+	// Check if start_date is after end_date
+	if startDate.After(endDate) {
 		return errors.New("tanggal selesai harus setelah tanggal mulai")
 	}
 
-	// Cek jika start_date berada di masa depan
-	if !startDate.StdTime().After(localNow.StdTime()) {
+	// Check if start_date is in the future
+	if !startDate.After(localNow) {
 		return errors.New("tanggal mulai harus di masa depan")
 	}
 

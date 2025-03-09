@@ -22,6 +22,8 @@ type Polls struct {
 	StartDate   time.Time
 	EndDate     time.Time
 	UserID      uint
+	Options     []*Options `gorm:"foreignKey:PollID"`
+	Votes       []*Votes   `gorm:"foreignKey:PollID"`
 	orm.SoftDeletes
 }
 

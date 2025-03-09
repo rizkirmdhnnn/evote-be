@@ -1,4 +1,17 @@
 definitions:
+  models.CreateOptionsResponse:
+    properties:
+      avatar:
+        type: string
+      desc:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+      votes_count:
+        type: integer
+    type: object
   models.CreatePollingResponse:
     properties:
       description:
@@ -41,6 +54,13 @@ definitions:
         items:
           $ref: '#/definitions/models.PollsResponse'
         type: array
+      message:
+        type: string
+    type: object
+  models.ResponseWithData-models_CreateOptionsResponse:
+    properties:
+      data:
+        $ref: '#/definitions/models.CreateOptionsResponse'
       message:
         type: string
     type: object
@@ -131,9 +151,62 @@ definitions:
       name:
         type: string
     type: object
+  requests.CreateOption:
+    properties:
+      avatar:
+        type: string
+      desc:
+        type: string
+      name:
+        type: string
+      poll_id:
+        type: string
+    type: object
   requests.CreatePolling:
+    properties:
+      description:
+        type: string
+      end_date:
+        format: date-time
+        type: string
+      start_date:
+        format: date-time
+        type: string
+      status:
+        description: |-
+          testing:
+          * active - Active, can be voted
+          * done - Done, can't be voted
+        enum:
+        - active
+        - done
+        type: string
+      title:
+        type: string
+    type: object
+  requests.UpdateOption:
+    properties:
+      avatar:
+        type: string
+      desc:
+        type: string
+      name:
+        type: string
+      poll_id:
+        type: string
     type: object
   requests.UpdatePolling:
+    properties:
+      description:
+        type: string
+      end_date:
+        type: string
+      start_date:
+        type: string
+      status:
+        $ref: '#/definitions/models.Status'
+      title:
+        type: string
     type: object
   requests.UserLogin:
     properties:
@@ -224,6 +297,110 @@ paths:
       summary: Register new user
       tags:
       - Auth
+  /options/{id}/delete:
+    delete:
+      consumes:
+      - application/json
+      description: Delete an option
+      parameters:
+      - description: Option ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Option deleted
+          schema:
+            $ref: '#/definitions/models.ResponseWithMessage'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: Option not found
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Delete an option
+      tags:
+      - Options
+  /options/{id}/update:
+    put:
+      consumes:
+      - application/json
+      description: Update an option
+      parameters:
+      - description: Option ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Option data
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/requests.UpdateOption'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Option updated
+          schema:
+            $ref: '#/definitions/models.ResponseWithData-models_CreateOptionsResponse'
+        "400":
+          description: Validation error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: Option not found
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Update an option
+      tags:
+      - Options
+  /options/create:
+    post:
+      consumes:
+      - application/json
+      description: Create a new option
+      parameters:
+      - description: Option data
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/requests.CreateOption'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Option created
+          schema:
+            $ref: '#/definitions/models.ResponseWithData-models_CreateOptionsResponse'
+        "400":
+          description: Validation error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Create a new option
+      tags:
+      - Options
   /polls:
     get:
       consumes:
