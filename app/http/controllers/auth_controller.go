@@ -32,7 +32,7 @@ func NewAuthController() *AuthController {
 //	If the email is already taken or if the input is invalid,
 //	appropriate error messages are returned.
 //
-// @Tags        auth
+// @Tags        Auth
 // @Accept      json
 // @Produce     json
 // @Param       request body requests.UserRegister true "User Registration Data"
@@ -110,7 +110,7 @@ func (r *AuthController) Register(ctx http.Context) http.Response {
 //
 // @Description Login user with email and password
 //
-// @Tags        auth
+// @Tags        Auth
 // @Accept      json
 // @Produce     json
 // @Param       request body requests.UserLogin true "User Login Data"
