@@ -314,12 +314,20 @@ func (r *PollsController) Delete(ctx http.Context) http.Response {
 			Errors:  "Invalid token",
 		})
 	}
-
 	// get poll id from path
 	id := ctx.Request().Route("id")
 
-	// delete poll
-	result, err := facades.Orm().Query().Model(&models.Polls{}).Where("user_id = ? AND id = ?", user.ID, id).Delete()
+	// Check if poll exists and belongs to user
+	var poll models.Polls
+	if err := facades.Orm().Query().Model(&poll).Where("id = ? AND user_id = ?", id, user.ID).FirstOrFail(&poll); err != nil {
+		return ctx.Response().Json(http.StatusNotFound, models.ErrorResponse{
+			Message: "something went wrong",
+			Errors:  "poll not found or you don't have permission",
+		})
+	}
+
+	// Begin transaction
+	tx, err := facades.Orm().Query().Begin()
 	if err != nil {
 		return ctx.Response().Json(http.StatusInternalServerError, models.ErrorResponse{
 			Message: "ups, something went wrong",
@@ -327,11 +335,29 @@ func (r *PollsController) Delete(ctx http.Context) http.Response {
 		})
 	}
 
-	// check if poll deleted
-	if result.RowsAffected == 0 {
-		return ctx.Response().Json(http.StatusNotFound, models.ErrorResponse{
-			Message: "something went wrong",
-			Errors:  "poll has been deleted or not found",
+	// Soft delete options
+	if _, err := tx.Model(&models.Options{}).Where("poll_id = ?", id).Delete(); err != nil {
+		tx.Rollback()
+		return ctx.Response().Json(http.StatusInternalServerError, models.ErrorResponse{
+			Message: "ups, something went wrong",
+			Errors:  err.Error(),
+		})
+	}
+
+	// Soft delete poll
+	if _, err := tx.Model(&poll).Delete(); err != nil {
+		tx.Rollback()
+		return ctx.Response().Json(http.StatusInternalServerError, models.ErrorResponse{
+			Message: "ups, something went wrong",
+			Errors:  err.Error(),
+		})
+	}
+
+	// Commit transaction
+	if err := tx.Commit(); err != nil {
+		return ctx.Response().Json(http.StatusInternalServerError, models.ErrorResponse{
+			Message: "ups, something went wrong",
+			Errors:  err.Error(),
 		})
 	}
 
