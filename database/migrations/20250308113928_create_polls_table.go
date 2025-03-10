@@ -23,6 +23,7 @@ func (r *M20250308113928CreatePollsTable) Up() error {
 			table.String("status")
 			table.Timestamp("start_date")
 			table.Timestamp("end_date")
+			table.String("code").Nullable()
 			table.Timestamps()
 			table.SoftDeletes()
 			table.BigInteger("user_id").Unsigned()

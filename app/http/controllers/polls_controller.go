@@ -439,3 +439,53 @@ func (r *PollsController) GetPollOptions(ctx http.Context) http.Response {
 		Data:    optResp,
 	})
 }
+
+// Get public polls, options for voting
+// @Summary Get public polls, options for voting
+//
+// @Description Get public polls, options for voting
+// @Tags Polls
+// @Accept json
+// @Produce json
+// @Param code query string true "Poll Code"
+// @Success 200 {object} models.ResponseWithData[models.PublicPollsResponse] "Polls found"
+// @Failure 404 {object} models.ErrorResponse "Poll not found"
+// @Router /polls/public [get]
+func (r *PollsController) GetPublicPolls(ctx http.Context) http.Response {
+	// Get query params from request
+	code := ctx.Request().Query("code")
+
+	// Check if code is empty
+	if code == "" {
+		return ctx.Response().Json(http.StatusBadRequest, models.ErrorResponse{
+			Message: "Validation error",
+			Errors:  "Code is required",
+		})
+	}
+
+	// Get poll and options by code
+	var poll models.Polls
+	if err := facades.Orm().Query().Model(&models.Polls{}).With("options").Where("code = ?", code).FirstOrFail(&poll); err != nil {
+		return ctx.Response().Json(http.StatusNotFound, models.ErrorResponse{
+			Message: "Poll not found",
+			Errors:  err.Error(),
+		})
+	}
+
+	// Check if poll is active
+	if poll.Status != models.Active {
+		return ctx.Response().Json(http.StatusBadRequest, models.ErrorResponse{
+			Message: "Poll is not active",
+			Errors:  "Poll is not active",
+		})
+	}
+
+	// Convert poll to Public Polls Response
+	pollResp := poll.ToPublicResponse()
+
+	// Return response
+	return ctx.Response().Json(http.StatusOK, models.ResponseWithData[models.PublicPollsResponse]{
+		Message: "Polls found",
+		Data:    pollResp,
+	})
+}

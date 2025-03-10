@@ -24,5 +24,7 @@ func (kernel Kernel) Seeders() []seeder.Seeder {
 	return []seeder.Seeder{
 		&seeders.DatabaseSeeder{},
 		&seeders.UserSeeder{},
+		&seeders.PollSeeder{},
+		&seeders.OptionSeeder{},
 	}
 }

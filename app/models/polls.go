@@ -21,6 +21,7 @@ type Polls struct {
 	Status      Status
 	StartDate   time.Time
 	EndDate     time.Time
+	Code        string
 	UserID      uint
 	Options     []*Options `gorm:"foreignKey:PollID"`
 	Votes       []*Votes   `gorm:"foreignKey:PollID"`
@@ -34,6 +35,7 @@ type CreatePollingResponse struct {
 	Status      Status
 	StartDate   time.Time `json:"start_date"`
 	EndDate     time.Time `json:"end_date"`
+	Code        string    `json:"code"`
 }
 
 type PollsResponse struct {
@@ -43,6 +45,7 @@ type PollsResponse struct {
 	Status      Status
 	StartDate   string `json:"start_date"`
 	EndDate     string `json:"end_date"`
+	Code        string `json:"code"`
 }
 
 type UpdatePollingResponse struct {
@@ -52,6 +55,18 @@ type UpdatePollingResponse struct {
 	Status      Status    `json:"status"`
 	StartDate   time.Time `json:"start_date"`
 	EndDate     time.Time `json:"end_date"`
+	Code        string    `json:"code"`
+}
+
+type PublicPollsResponse struct {
+	ID          int       `json:"id"`
+	Title       string    `json:"title"`
+	Description string    `json:"description"`
+	Status      Status    `json:"status"`
+	StartDate   time.Time `json:"start_date"`
+	EndDate     time.Time `json:"end_date"`
+	Code        string    `json:"code"`
+	Options     []OptionsResponse
 }
 
 func (p *Polls) ToResponse() PollsResponse {
@@ -62,5 +77,22 @@ func (p *Polls) ToResponse() PollsResponse {
 		Status:      p.Status,
 		StartDate:   p.StartDate.String(),
 		EndDate:     p.EndDate.String(),
+	}
+}
+
+func (p *Polls) ToPublicResponse() PublicPollsResponse {
+	var options []OptionsResponse
+	for _, o := range p.Options {
+		options = append(options, o.ToResponseList())
+	}
+	return PublicPollsResponse{
+		ID:          int(p.ID),
+		Title:       p.Title,
+		Description: p.Description,
+		Status:      p.Status,
+		StartDate:   p.StartDate,
+		EndDate:     p.EndDate,
+		Code:        p.Code,
+		Options:     options,
 	}
 }

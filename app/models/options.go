@@ -23,6 +23,13 @@ type CreateOptionsResponse struct {
 	VotesCount uint   `json:"votes_count"`
 }
 
+type OptionsResponse struct {
+	ID     int    `json:"id"`
+	Name   string `json:"name"`
+	Desc   string `json:"desc"`
+	Avatar string `json:"avatar"`
+}
+
 func (r *Options) ToResponse() CreateOptionsResponse {
 	return CreateOptionsResponse{
 		ID:         int(r.ID),
@@ -30,5 +37,14 @@ func (r *Options) ToResponse() CreateOptionsResponse {
 		Desc:       r.Desc,
 		Avatar:     r.Avatar,
 		VotesCount: r.VotesCount,
+	}
+}
+
+func (r *Options) ToResponseList() OptionsResponse {
+	return OptionsResponse{
+		ID:     int(r.ID),
+		Name:   r.Name,
+		Desc:   r.Desc,
+		Avatar: r.Avatar,
 	}
 }

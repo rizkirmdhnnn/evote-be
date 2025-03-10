@@ -384,6 +384,44 @@
                 }
             }
         },
+        "/polls/public": {
+            "get": {
+                "description": "Get public polls, options for voting",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Polls"
+                ],
+                "summary": "Get public polls, options for voting",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Poll Code",
+                        "name": "code",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Polls found",
+                        "schema": {
+                            "$ref": "#/definitions/models.ResponseWithData-models_PublicPollsResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Poll not found",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/polls/{id}": {
             "get": {
                 "security": [
@@ -638,6 +676,9 @@
         "models.CreatePollingResponse": {
             "type": "object",
             "properties": {
+                "code": {
+                    "type": "string"
+                },
                 "description": {
                     "type": "string"
                 },
@@ -667,9 +708,29 @@
                 }
             }
         },
+        "models.OptionsResponse": {
+            "type": "object",
+            "properties": {
+                "avatar": {
+                    "type": "string"
+                },
+                "desc": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
         "models.PollsResponse": {
             "type": "object",
             "properties": {
+                "code": {
+                    "type": "string"
+                },
                 "description": {
                     "type": "string"
                 },
@@ -678,6 +739,38 @@
                 },
                 "id": {
                     "type": "integer"
+                },
+                "start_date": {
+                    "type": "string"
+                },
+                "status": {
+                    "$ref": "#/definitions/models.Status"
+                },
+                "title": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.PublicPollsResponse": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "end_date": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "options": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.OptionsResponse"
+                    }
                 },
                 "start_date": {
                     "type": "string"
@@ -731,6 +824,17 @@
             "properties": {
                 "data": {
                     "$ref": "#/definitions/models.PollsResponse"
+                },
+                "message": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.ResponseWithData-models_PublicPollsResponse": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "$ref": "#/definitions/models.PublicPollsResponse"
                 },
                 "message": {
                     "type": "string"
@@ -792,6 +896,9 @@
         "models.UpdatePollingResponse": {
             "type": "object",
             "properties": {
+                "code": {
+                    "type": "string"
+                },
                 "description": {
                     "type": "string"
                 },

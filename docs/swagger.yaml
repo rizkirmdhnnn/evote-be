@@ -14,6 +14,8 @@ definitions:
     type: object
   models.CreatePollingResponse:
     properties:
+      code:
+        type: string
       description:
         type: string
       end_date:
@@ -33,14 +35,48 @@ definitions:
       message:
         type: string
     type: object
+  models.OptionsResponse:
+    properties:
+      avatar:
+        type: string
+      desc:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+    type: object
   models.PollsResponse:
     properties:
+      code:
+        type: string
       description:
         type: string
       end_date:
         type: string
       id:
         type: integer
+      start_date:
+        type: string
+      status:
+        $ref: '#/definitions/models.Status'
+      title:
+        type: string
+    type: object
+  models.PublicPollsResponse:
+    properties:
+      code:
+        type: string
+      description:
+        type: string
+      end_date:
+        type: string
+      id:
+        type: integer
+      options:
+        items:
+          $ref: '#/definitions/models.OptionsResponse'
+        type: array
       start_date:
         type: string
       status:
@@ -75,6 +111,13 @@ definitions:
     properties:
       data:
         $ref: '#/definitions/models.PollsResponse'
+      message:
+        type: string
+    type: object
+  models.ResponseWithData-models_PublicPollsResponse:
+    properties:
+      data:
+        $ref: '#/definitions/models.PublicPollsResponse'
       message:
         type: string
     type: object
@@ -114,6 +157,8 @@ definitions:
     - Done
   models.UpdatePollingResponse:
     properties:
+      code:
+        type: string
       description:
         type: string
       end_date:
@@ -617,6 +662,31 @@ paths:
       security:
       - Bearer: []
       summary: Store new poll
+      tags:
+      - Polls
+  /polls/public:
+    get:
+      consumes:
+      - application/json
+      description: Get public polls, options for voting
+      parameters:
+      - description: Poll Code
+        in: query
+        name: code
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Polls found
+          schema:
+            $ref: '#/definitions/models.ResponseWithData-models_PublicPollsResponse'
+        "404":
+          description: Poll not found
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: Get public polls, options for voting
       tags:
       - Polls
 securityDefinitions:
