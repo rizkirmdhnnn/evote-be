@@ -31,7 +31,7 @@ definitions:
     type: object
   models.ErrorResponse:
     properties:
-      error: {}
+      errors: {}
       message:
         type: string
     type: object
@@ -258,6 +258,13 @@ definitions:
       name:
         type: string
       password:
+        type: string
+    type: object
+  requests.UserUpdate:
+    properties:
+      email:
+        type: string
+      name:
         type: string
     type: object
 host: localhost:3000
@@ -678,6 +685,38 @@ paths:
       summary: Get public polls, options for voting
       tags:
       - Polls
+  /users/update:
+    put:
+      consumes:
+      - application/json
+      description: Update user
+      parameters:
+      - description: User data
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/requests.UserUpdate'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success response
+          schema:
+            $ref: '#/definitions/models.ResponseWithData-models_UserRegisterResponse'
+        "400":
+          description: Validation error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Update user
+      tags:
+      - Users
 securityDefinitions:
   Bearer:
     in: header

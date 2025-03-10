@@ -11,10 +11,14 @@ func Api() {
 	authController := controllers.NewAuthController()
 	pollsController := controllers.NewPollsController()
 	optionController := controllers.NewOptionController()
+	userController := controllers.NewUserController()
 
 	// @Group Auth
 	facades.Route().Post("/auth/register", authController.Register)
 	facades.Route().Post("/auth/login", authController.Login)
+
+	// @Group Users
+	facades.Route().Middleware(middleware.Auth()).Put("/users/update", userController.Update)
 
 	// @Group Polls
 	facades.Route().Middleware(middleware.Auth()).Get("/polls", pollsController.Index)
