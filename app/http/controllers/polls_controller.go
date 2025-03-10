@@ -465,7 +465,7 @@ func (r *PollsController) GetPublicPolls(ctx http.Context) http.Response {
 
 	// Get poll and options by code
 	var poll models.Polls
-	if err := facades.Orm().Query().Model(&models.Polls{}).With("options").Where("code = ?", code).FirstOrFail(&poll); err != nil {
+	if err := facades.Orm().Query().Model(&models.Polls{}).With("Options").Where("code = ?", code).FirstOrFail(&poll); err != nil {
 		return ctx.Response().Json(http.StatusNotFound, models.ErrorResponse{
 			Message: "Poll not found",
 			Errors:  err.Error(),
@@ -475,8 +475,8 @@ func (r *PollsController) GetPublicPolls(ctx http.Context) http.Response {
 	// Check if poll is active
 	if poll.Status != models.Active {
 		return ctx.Response().Json(http.StatusBadRequest, models.ErrorResponse{
-			Message: "Poll is not active",
-			Errors:  "Poll is not active",
+			Message: "The poll is currently inactive.",
+			Errors:  "POLL_INACTIVE",
 		})
 	}
 

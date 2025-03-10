@@ -35,17 +35,6 @@ definitions:
       message:
         type: string
     type: object
-  models.OptionsResponse:
-    properties:
-      avatar:
-        type: string
-      desc:
-        type: string
-      id:
-        type: integer
-      name:
-        type: string
-    type: object
   models.PollsResponse:
     properties:
       code:
@@ -75,7 +64,7 @@ definitions:
         type: integer
       options:
         items:
-          $ref: '#/definitions/models.OptionsResponse'
+          $ref: '#/definitions/models.CreateOptionsResponse'
         type: array
       start_date:
         type: string

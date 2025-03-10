@@ -715,23 +715,6 @@ const docTemplate = `{
                 }
             }
         },
-        "models.OptionsResponse": {
-            "type": "object",
-            "properties": {
-                "avatar": {
-                    "type": "string"
-                },
-                "desc": {
-                    "type": "string"
-                },
-                "id": {
-                    "type": "integer"
-                },
-                "name": {
-                    "type": "string"
-                }
-            }
-        },
         "models.PollsResponse": {
             "type": "object",
             "properties": {
@@ -776,7 +759,7 @@ const docTemplate = `{
                 "options": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/models.OptionsResponse"
+                        "$ref": "#/definitions/models.CreateOptionsResponse"
                     }
                 },
                 "start_date": {

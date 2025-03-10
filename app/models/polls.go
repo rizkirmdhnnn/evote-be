@@ -66,7 +66,7 @@ type PublicPollsResponse struct {
 	StartDate   time.Time `json:"start_date"`
 	EndDate     time.Time `json:"end_date"`
 	Code        string    `json:"code"`
-	Options     []OptionsResponse
+	Options     []CreateOptionsResponse
 }
 
 func (p *Polls) ToResponse() PollsResponse {
@@ -81,9 +81,9 @@ func (p *Polls) ToResponse() PollsResponse {
 }
 
 func (p *Polls) ToPublicResponse() PublicPollsResponse {
-	var options []OptionsResponse
+	var options []CreateOptionsResponse
 	for _, o := range p.Options {
-		options = append(options, o.ToResponseList())
+		options = append(options, o.ToResponse())
 	}
 	return PublicPollsResponse{
 		ID:          int(p.ID),
