@@ -7,7 +7,7 @@ type ResponseWithData[T any] struct {
 
 type ErrorResponse struct {
 	Message string `json:"message"`
-	Errors  any    `json:"error"`
+	Errors  any    `json:"errors"`
 }
 
 type ResponseWithMessage struct {
