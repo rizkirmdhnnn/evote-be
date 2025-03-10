@@ -76,12 +76,12 @@ func (r *CreatePolling) PrepareForValidation(ctx http.Context, data validation.D
 
 	// Check if start_date is after end_date
 	if startDate.After(endDate) {
-		return errors.New("tanggal selesai harus setelah tanggal mulai")
+		return errors.New("invalid start_date, must be before end_date")
 	}
 
 	// Check if start_date is in the future
 	if !startDate.After(localNow) {
-		return errors.New("tanggal mulai harus di masa depan")
+		return errors.New("invalid start_date, must be in the future")
 	}
 
 	return nil
