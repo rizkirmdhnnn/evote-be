@@ -24,6 +24,7 @@ import (
 	"github.com/goravel/framework/translation"
 	"github.com/goravel/framework/validation"
 	"github.com/goravel/gin"
+	"github.com/goravel/minio"
 
 	"evote-be/app/providers"
 )
@@ -119,6 +120,7 @@ func init() {
 			&providers.ValidationServiceProvider{},
 			&providers.DatabaseServiceProvider{},
 			&gin.ServiceProvider{},
+			&minio.ServiceProvider{},
 		},
 	})
 }
