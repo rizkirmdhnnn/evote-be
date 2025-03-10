@@ -65,11 +65,16 @@ func (r *UserController) Update(ctx http.Context) http.Response {
 		})
 	}
 
-	// Prepare user data
-	user := models.User{
-		Name:  u.Name,
-		Email: u.Email,
+	// Get user data
+	var user models.User
+	if err := facades.Orm().Query().Model(&models.User{}).Where("id = ?", u.ID).First(&user); err != nil {
+		return ctx.Response().Json(http.StatusBadRequest, models.ErrorResponse{
+			Message: "Failed to update user",
+			Errors:  "User not found",
+		})
 	}
+
+	// Update fields if not empty
 	if request.Name != "" {
 		user.Name = request.Name
 	}
