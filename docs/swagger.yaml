@@ -685,6 +685,37 @@ paths:
       summary: Get public polls, options for voting
       tags:
       - Polls
+  /users/avatar:
+    post:
+      consumes:
+      - application/json
+      description: Upload user avatar
+      parameters:
+      - description: User avatar
+        in: formData
+        name: avatar
+        required: true
+        type: file
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success response
+          schema:
+            $ref: '#/definitions/models.ResponseWithData-models_UserRegisterResponse'
+        "400":
+          description: Validation error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Upload user avatar
+      tags:
+      - Users
   /users/update:
     put:
       consumes:
