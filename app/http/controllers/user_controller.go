@@ -196,27 +196,12 @@ func (r *UserController) UploadAvatar(ctx http.Context) http.Response {
 	}
 
 	// Update user avatar
-	result, err := facades.Orm().Query().Model(&models.User{}).Where("id = ?", u.ID).Update("avatar", url)
-	if err != nil {
+	// Using postgresql RETURNING * to get updated user data
+	var user models.User
+	if err := facades.Orm().Query().Raw("UPDATE users SET avatar = ? WHERE id = ? RETURNING *", url, u.ID).Scan(&user); err != nil {
 		return ctx.Response().Json(http.StatusBadRequest, models.ErrorResponse{
 			Message: "Failed to update user avatar",
 			Errors:  err.Error(),
-		})
-	}
-
-	// Check if user not found
-	if result.RowsAffected == 0 {
-		return ctx.Response().Json(http.StatusBadRequest, models.ErrorResponse{
-			Message: "Failed to update user avatar",
-			Errors:  "User not found",
-		})
-	}
-
-	// Get user data
-	if err := facades.Orm().Query().Model(&models.User{}).Where("id = ?", u.ID).First(&u); err != nil {
-		return ctx.Response().Json(http.StatusBadRequest, models.ErrorResponse{
-			Message: "Failed to update user avatar",
-			Errors:  "User not found",
 		})
 	}
 
@@ -224,10 +209,10 @@ func (r *UserController) UploadAvatar(ctx http.Context) http.Response {
 	return ctx.Response().Json(http.StatusCreated, models.ResponseWithData[models.UserRegisterResponse]{
 		Message: "avatar uploaded successfully",
 		Data: models.UserRegisterResponse{
-			ID:     int(u.ID),
-			Name:   u.Name,
-			Email:  u.Email,
-			Avatar: url,
+			ID:     int(user.ID),
+			Name:   user.Name,
+			Email:  user.Email,
+			Avatar: user.Avatar,
 		},
 	})
 }
