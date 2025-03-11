@@ -136,13 +136,25 @@ const docTemplate = `{
                 "summary": "Create a new option",
                 "parameters": [
                     {
-                        "description": "Option data",
-                        "name": "request",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/requests.CreateOption"
-                        }
+                        "type": "string",
+                        "name": "desc",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "name": "name",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "name": "poll_id",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "file",
+                        "description": "Option avatar",
+                        "name": "avatar",
+                        "in": "formData"
                     }
                 ],
                 "responses": {
@@ -1042,23 +1054,6 @@ const docTemplate = `{
                     "type": "integer"
                 },
                 "name": {
-                    "type": "string"
-                }
-            }
-        },
-        "requests.CreateOption": {
-            "type": "object",
-            "properties": {
-                "avatar": {
-                    "type": "string"
-                },
-                "desc": {
-                    "type": "string"
-                },
-                "name": {
-                    "type": "string"
-                },
-                "poll_id": {
                     "type": "string"
                 }
             }

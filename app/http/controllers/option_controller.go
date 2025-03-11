@@ -3,6 +3,7 @@ package controllers
 import (
 	"evote-be/app/http/requests"
 	"evote-be/app/models"
+	"fmt"
 	"strconv"
 
 	"github.com/goravel/framework/contracts/http"
@@ -31,7 +32,8 @@ func (r *OptionController) Index(ctx http.Context) http.Response {
 // @Accept json
 // @Produce json
 // @Security Bearer
-// @Param request body requests.CreateOption true "Option data"
+// @Param request formData requests.CreateOption true "Option data"
+// @Param avatar formData file false "Option avatar"
 // @Success 201 {object} models.ResponseWithData[models.CreateOptionsResponse] "Option created"
 // @Failure 400 {object} models.ErrorResponse "Validation error"
 // @Failure 401 {object} models.ErrorResponse "Unauthorized"
@@ -88,11 +90,50 @@ func (r *OptionController) Store(ctx http.Context) http.Response {
 		})
 	}
 
+	// Get file
+	file, err := ctx.Request().File("avatar")
+	if err != nil {
+		return ctx.Response().Json(http.StatusBadRequest, models.ErrorResponse{
+			Message: "Failed to upload avatar",
+			Errors:  err.Error(),
+		})
+	}
+
+	// Get file extension
+	extension, err := file.Extension()
+	if err != nil {
+		return ctx.Response().Json(http.StatusBadRequest, models.ErrorResponse{
+			Message: "Failed to determine file extension",
+			Errors:  err.Error(),
+		})
+	}
+
+	// Generate file name
+	fileName := fmt.Sprintf("poll_%d_option_%d.%s", poll.ID, user.ID, extension)
+
+	// Upload file to MinIO
+	path, err := facades.Storage().Disk("minio").PutFileAs("options", file, fileName)
+	if err != nil {
+		return ctx.Response().Json(http.StatusInternalServerError, models.ErrorResponse{
+			Message: "Failed to upload avatar",
+			Errors:  err.Error(),
+		})
+	}
+
+	// Ambil URL dari MinIO
+	url := facades.Storage().Disk("minio").Url(path)
+
+	// Perbaiki skema URL
+	if facades.Config().GetBool("MINIO_SSL") {
+		url = "https://" + url
+	} else {
+		url = "http://" + url
+	}
 	// Create new option
 	option := models.Options{
 		Name:   request.Name,
 		Desc:   request.Desc,
-		Avatar: request.Avatar,
+		Avatar: url,
 		PollID: uint(pollID),
 	}
 

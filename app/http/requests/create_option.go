@@ -1,15 +1,17 @@
 package requests
 
 import (
+	"mime/multipart"
+
 	"github.com/goravel/framework/contracts/http"
 	"github.com/goravel/framework/contracts/validation"
 )
 
 type CreateOption struct {
-	Name   string `json:"name"`
-	Desc   string `json:"desc"`
-	Avatar string `json:"avatar"`
-	PollID string `json:"poll_id"`
+	Name   string               `json:"name" form:"name"`
+	Desc   string               `json:"desc" form:"desc"`
+	Avatar multipart.FileHeader `json:"avatar" form:"avatar" swaggerignore:"true"`
+	PollID string               `json:"poll_id" form:"poll_id"`
 }
 
 func (r *CreateOption) Authorize(ctx http.Context) error {
@@ -25,7 +27,7 @@ func (r *CreateOption) Rules(ctx http.Context) map[string]string {
 		"name":    "required|string",
 		"desc":    "required|string",
 		"poll_id": "required|string",
-		"avatar":  "string",
+		"avatar":  "file|image",
 	}
 }
 

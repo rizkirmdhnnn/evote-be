@@ -185,17 +185,6 @@ definitions:
       name:
         type: string
     type: object
-  requests.CreateOption:
-    properties:
-      avatar:
-        type: string
-      desc:
-        type: string
-      name:
-        type: string
-      poll_id:
-        type: string
-    type: object
   requests.CreatePolling:
     properties:
       description:
@@ -418,12 +407,19 @@ paths:
       - application/json
       description: Create a new option
       parameters:
-      - description: Option data
-        in: body
-        name: request
-        required: true
-        schema:
-          $ref: '#/definitions/requests.CreateOption'
+      - in: formData
+        name: desc
+        type: string
+      - in: formData
+        name: name
+        type: string
+      - in: formData
+        name: poll_id
+        type: string
+      - description: Option avatar
+        in: formData
+        name: avatar
+        type: file
       produces:
       - application/json
       responses:
