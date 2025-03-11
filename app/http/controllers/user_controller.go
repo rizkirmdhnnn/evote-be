@@ -4,6 +4,7 @@ import (
 	"errors"
 	"evote-be/app/http/requests"
 	"evote-be/app/models"
+	"fmt"
 
 	"github.com/goravel/framework/contracts/http"
 	"github.com/goravel/framework/facades"
@@ -112,6 +113,101 @@ func (r *UserController) Update(ctx http.Context) http.Response {
 	// Return success response
 	return ctx.Response().Json(http.StatusCreated, models.ResponseWithData[models.UserRegisterResponse]{
 		Message: "user updated successfully",
+		Data: models.UserRegisterResponse{
+			ID:     int(user.ID),
+			Name:   user.Name,
+			Email:  user.Email,
+			Avatar: user.Avatar,
+		},
+	})
+}
+
+// UploadAvatar Upload user avatar
+// @Summary Upload user avatar
+// @Description Upload user avatar
+// @Tags Users
+// @Accept json
+// @Produce json
+// @Security Bearer
+// @Param avatar formData file true "User avatar"
+// @Success 	200 {object} models.ResponseWithData[models.UserRegisterResponse] "Success response"
+// @Failure 	400 {object} models.ErrorResponse "Validation error"
+// @Failure 	401 {object} models.ErrorResponse "Unauthorized"
+// @Router /users/avatar [post]
+// TODO: Compress image before storing
+func (r *UserController) UploadAvatar(ctx http.Context) http.Response {
+	// Get user from context
+	u, ok := ctx.Value("user").(models.User)
+	if !ok {
+		return ctx.Response().Json(http.StatusUnauthorized, models.ErrorResponse{
+			Message: "Unauthorized",
+			Errors:  "Invalid token",
+		})
+	}
+
+	file, err := ctx.Request().File("avatar")
+	if err != nil {
+		return ctx.Response().Json(http.StatusBadRequest, models.ErrorResponse{
+			Message: "Failed to upload avatar",
+			Errors:  err.Error(),
+		})
+	}
+
+	// Get file extension
+	extension, err := file.Extension()
+	if err != nil {
+		return ctx.Response().Json(http.StatusBadRequest, models.ErrorResponse{
+			Message: "Failed to determine file extension",
+			Errors:  err.Error(),
+		})
+	}
+
+	// Allowed file types
+	allowedTypes := map[string]bool{"jpg": true, "jpeg": true, "png": true, "gif": true}
+
+	// Check if extension is allowed
+	if !allowedTypes[extension] {
+		return ctx.Response().Json(http.StatusBadRequest, models.ErrorResponse{
+			Message: "Invalid file type",
+			Errors:  "Only JPG, JPEG, PNG, and GIF are allowed",
+		})
+	}
+
+	// Generate file name
+	fileName := fmt.Sprintf("avatar_%d.%s", u.ID, extension)
+
+	// Upload file to MinIO
+	path, err := facades.Storage().Disk("minio").PutFileAs("avatars", file, fileName)
+	if err != nil {
+		return ctx.Response().Json(http.StatusInternalServerError, models.ErrorResponse{
+			Message: "Failed to upload avatar",
+			Errors:  err.Error(),
+		})
+	}
+
+	// Ambil URL dari MinIO
+	url := facades.Storage().Disk("minio").Url(path)
+
+	// Perbaiki skema URL
+	if facades.Config().GetBool("MINIO_SSL") {
+		url = "https://" + url
+	} else {
+		url = "http://" + url
+	}
+
+	// Update user avatar
+	// Using postgresql RETURNING * to get updated user data
+	var user models.User
+	if err := facades.Orm().Query().Raw("UPDATE users SET avatar = ? WHERE id = ? RETURNING *", url, u.ID).Scan(&user); err != nil {
+		return ctx.Response().Json(http.StatusBadRequest, models.ErrorResponse{
+			Message: "Failed to update user avatar",
+			Errors:  err.Error(),
+		})
+	}
+
+	// Return success response
+	return ctx.Response().Json(http.StatusCreated, models.ResponseWithData[models.UserRegisterResponse]{
+		Message: "avatar uploaded successfully",
 		Data: models.UserRegisterResponse{
 			ID:     int(user.ID),
 			Name:   user.Name,
