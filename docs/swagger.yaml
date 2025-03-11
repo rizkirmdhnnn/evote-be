@@ -209,17 +209,6 @@ definitions:
       title:
         type: string
     type: object
-  requests.UpdateOption:
-    properties:
-      avatar:
-        type: string
-      desc:
-        type: string
-      name:
-        type: string
-      poll_id:
-        type: string
-    type: object
   requests.UpdatePolling:
     properties:
       description:
@@ -371,12 +360,19 @@ paths:
         name: id
         required: true
         type: string
-      - description: Option data
-        in: body
-        name: request
-        required: true
-        schema:
-          $ref: '#/definitions/requests.UpdateOption'
+      - in: formData
+        name: desc
+        type: string
+      - in: formData
+        name: name
+        type: string
+      - in: formData
+        name: poll_id
+        type: string
+      - description: Option avatar
+        in: formData
+        name: avatar
+        type: file
       produces:
       - application/json
       responses:

@@ -255,13 +255,25 @@ const docTemplate = `{
                         "required": true
                     },
                     {
-                        "description": "Option data",
-                        "name": "request",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/requests.UpdateOption"
-                        }
+                        "type": "string",
+                        "name": "desc",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "name": "name",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "name": "poll_id",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "file",
+                        "description": "Option avatar",
+                        "name": "avatar",
+                        "in": "formData"
                     }
                 ],
                 "responses": {
@@ -1083,23 +1095,6 @@ const docTemplate = `{
                     ]
                 },
                 "title": {
-                    "type": "string"
-                }
-            }
-        },
-        "requests.UpdateOption": {
-            "type": "object",
-            "properties": {
-                "avatar": {
-                    "type": "string"
-                },
-                "desc": {
-                    "type": "string"
-                },
-                "name": {
-                    "type": "string"
-                },
-                "poll_id": {
                     "type": "string"
                 }
             }

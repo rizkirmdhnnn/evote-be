@@ -161,7 +161,8 @@ func (r *OptionController) Store(ctx http.Context) http.Response {
 // @Produce json
 // @Security Bearer
 // @Param id path string true "Option ID"
-// @Param request body requests.UpdateOption true "Option data"
+// @Param request formData requests.UpdateOption true "Option data"
+// @Param avatar formData file false "Option avatar"
 // @Success 200 {object} models.ResponseWithData[models.CreateOptionsResponse] "Option updated"
 // @Failure 400 {object} models.ErrorResponse "Validation error"
 // @Failure 401 {object} models.ErrorResponse "Unauthorized"
@@ -196,6 +197,9 @@ func (r *OptionController) Update(ctx http.Context) http.Response {
 			Errors:  errorData,
 		})
 	}
+
+	// Get avatar
+	file, _ := ctx.Request().File("avatar")
 
 	// Check if option_id is valid
 	id, err := strconv.ParseUint(optionID, 10, 64)
@@ -240,19 +244,51 @@ func (r *OptionController) Update(ctx http.Context) http.Response {
 	if request.Desc != "" {
 		option.Desc = request.Desc
 	}
-	if request.Avatar != "" {
-		option.Avatar = request.Avatar
-	}
-	if request.PollID != "" {
-		pollID, err := strconv.ParseUint(request.PollID, 10, 64)
+	if file != nil {
+		// Get file extension
+		extension, err := file.Extension()
 		if err != nil {
 			return ctx.Response().Json(http.StatusBadRequest, models.ErrorResponse{
-				Message: "Validation error",
-				Errors:  "Invalid poll_id",
+				Message: "Failed to determine file extension",
+				Errors:  err.Error(),
 			})
 		}
-		option.PollID = uint(pollID)
+
+		// Generate file name
+		fileName := fmt.Sprintf("poll_%d_option_%d.%s", poll.ID, user.ID, extension)
+
+		// Upload file to MinIO
+		path, err := facades.Storage().Disk("minio").PutFileAs("options", file, fileName)
+		if err != nil {
+			return ctx.Response().Json(http.StatusInternalServerError, models.ErrorResponse{
+				Message: "Failed to upload avatar",
+				Errors:  err.Error(),
+			})
+		}
+
+		// Get URL from MinIO
+		url := facades.Storage().Disk("minio").Url(path)
+
+		// Fix URL schema
+		if facades.Config().GetBool("MINIO_SSL") {
+			url = "https://" + url
+		} else {
+			url = "http://" + url
+		}
+
+		// Update avatar
+		option.Avatar = url
 	}
+
+	// Check if poll_id is valid
+	pollID, err := strconv.ParseUint(request.PollID, 10, 64)
+	if err != nil {
+		return ctx.Response().Json(http.StatusBadRequest, models.ErrorResponse{
+			Message: "Validation error",
+			Errors:  "Invalid poll_id",
+		})
+	}
+	option.PollID = uint(pollID)
 
 	// Save option
 	if err := query.Save(&option); err != nil {
