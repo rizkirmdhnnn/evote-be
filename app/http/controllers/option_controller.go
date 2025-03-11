@@ -64,6 +64,9 @@ func (r *OptionController) Store(ctx http.Context) http.Response {
 		})
 	}
 
+	// Get avatar
+	file, _ := ctx.Request().File("avatar")
+
 	// Check if poll_id is valid
 	pollID, err := strconv.ParseUint(request.PollID, 10, 64)
 	if err != nil {
@@ -90,50 +93,47 @@ func (r *OptionController) Store(ctx http.Context) http.Response {
 		})
 	}
 
-	// Get file
-	file, err := ctx.Request().File("avatar")
-	if err != nil {
-		return ctx.Response().Json(http.StatusBadRequest, models.ErrorResponse{
-			Message: "Failed to upload avatar",
-			Errors:  err.Error(),
-		})
+	// Upload avatar to MinIO if avatar is exists
+	if file != nil {
+		// Get file extension
+		extension, err := file.Extension()
+		if err != nil {
+			return ctx.Response().Json(http.StatusBadRequest, models.ErrorResponse{
+				Message: "Failed to determine file extension",
+				Errors:  err.Error(),
+			})
+		}
+
+		// Generate file name
+		fileName := fmt.Sprintf("poll_%d_option_%d.%s", poll.ID, user.ID, extension)
+
+		// Upload file to MinIO
+		path, err := facades.Storage().Disk("minio").PutFileAs("options", file, fileName)
+		if err != nil {
+			return ctx.Response().Json(http.StatusInternalServerError, models.ErrorResponse{
+				Message: "Failed to upload avatar",
+				Errors:  err.Error(),
+			})
+		}
+
+		// Ambil URL dari MinIO
+		url := facades.Storage().Disk("minio").Url(path)
+
+		// Perbaiki skema URL
+		if facades.Config().GetBool("MINIO_SSL") {
+			url = "https://" + url
+		} else {
+			url = "http://" + url
+		}
+
+		user.Avatar = url
 	}
 
-	// Get file extension
-	extension, err := file.Extension()
-	if err != nil {
-		return ctx.Response().Json(http.StatusBadRequest, models.ErrorResponse{
-			Message: "Failed to determine file extension",
-			Errors:  err.Error(),
-		})
-	}
-
-	// Generate file name
-	fileName := fmt.Sprintf("poll_%d_option_%d.%s", poll.ID, user.ID, extension)
-
-	// Upload file to MinIO
-	path, err := facades.Storage().Disk("minio").PutFileAs("options", file, fileName)
-	if err != nil {
-		return ctx.Response().Json(http.StatusInternalServerError, models.ErrorResponse{
-			Message: "Failed to upload avatar",
-			Errors:  err.Error(),
-		})
-	}
-
-	// Ambil URL dari MinIO
-	url := facades.Storage().Disk("minio").Url(path)
-
-	// Perbaiki skema URL
-	if facades.Config().GetBool("MINIO_SSL") {
-		url = "https://" + url
-	} else {
-		url = "http://" + url
-	}
 	// Create new option
 	option := models.Options{
 		Name:   request.Name,
 		Desc:   request.Desc,
-		Avatar: url,
+		Avatar: user.Avatar,
 		PollID: uint(pollID),
 	}
 
