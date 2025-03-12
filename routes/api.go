@@ -28,6 +28,7 @@ func Api() {
 	facades.Route().Middleware(middleware.Auth()).Put("/polls/{id}/update", pollsController.Update)
 	facades.Route().Middleware(middleware.Auth()).Delete("/polls/{id}/delete", pollsController.Delete)
 	facades.Route().Middleware(middleware.Auth()).Get("/polls/{id}/options", pollsController.GetPollOptions)
+	facades.Route().Middleware(middleware.Auth()).Get("/polls/{id}/generate", pollsController.GeneratePublicPollCode)
 	facades.Route().Get("/polls/public", pollsController.GetPublicPolls)
 
 	// @Group Options

@@ -3,8 +3,11 @@ package controllers
 import (
 	"evote-be/app/http/requests"
 	"evote-be/app/models"
+	"fmt"
 	"math"
+	"math/rand"
 	"strconv"
+	"time"
 
 	"github.com/goravel/framework/contracts/http"
 	"github.com/goravel/framework/facades"
@@ -488,4 +491,74 @@ func (r *PollsController) GetPublicPolls(ctx http.Context) http.Response {
 		Message: "Polls found",
 		Data:    pollResp,
 	})
+}
+
+// Generate public poll code
+// @Summary Generate public poll code
+// @Description Generate public poll code
+// @Tags Polls
+// @Accept json
+// @Produce json
+// @Security Bearer
+// @Param id path string true "Poll ID"
+// @Success 200 {object} models.ResponseWithData[models.PollsResponse] "Poll code generated"
+// @Failure 404 {object} models.ErrorResponse "Poll not found"
+// @Router /polls/{id}/generate [get]
+func (r *PollsController) GeneratePublicPollCode(ctx http.Context) http.Response {
+	// Get user from context
+	user, ok := ctx.Value("user").(models.User)
+	fmt.Sprintf("user: %v", user)
+	if !ok {
+		return ctx.Response().Json(http.StatusUnauthorized, models.ErrorResponse{
+			Message: "Unauthorized",
+			Errors:  "Invalid token",
+		})
+	}
+
+	// Get poll id from path
+	id := ctx.Request().Route("id")
+
+	// Check if poll exists and belongs to user
+	var poll models.Polls
+	if err := facades.Orm().Query().Model(&poll).Where("id = ? AND user_id = ?", id, user.ID).FirstOrFail(&poll); err != nil {
+		return ctx.Response().Json(http.StatusNotFound, models.ErrorResponse{
+			Message: "Poll not found",
+			Errors:  err.Error(),
+		})
+	}
+
+	// Generate public code
+	if poll.Code != "" {
+		return ctx.Response().Json(http.StatusOK, models.ResponseWithData[models.PollsResponse]{
+			Message: "Poll code already generated",
+			Data:    poll.ToResponse(),
+		})
+	}
+	code := randomString(6)
+
+	// Update poll with code
+	poll.Code = code
+	if err := facades.Orm().Query().Save(&poll); err != nil {
+		return ctx.Response().Json(http.StatusInternalServerError, models.ErrorResponse{
+			Message: "Failed to generate code",
+			Errors:  err.Error(),
+		})
+	}
+
+	// Return response
+	return ctx.Response().Json(http.StatusOK, models.ResponseWithData[models.PollsResponse]{
+		Message: "Poll code generated",
+		Data:    poll.ToResponse(),
+	})
+}
+
+var randomizer = rand.New(rand.NewSource(time.Now().UTC().UnixNano()))
+var letters = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
+
+func randomString(length int) string {
+	b := make([]rune, length)
+	for i := range b {
+		b[i] = letters[randomizer.Intn(len(letters))]
+	}
+	return string(b)
 }
