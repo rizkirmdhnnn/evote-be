@@ -20,6 +20,7 @@ func Api() {
 	// @Group Users
 	facades.Route().Middleware(middleware.Auth()).Put("/users/update", userController.Update)
 	facades.Route().Middleware(middleware.Auth()).Post("/users/avatar", userController.UploadAvatar)
+	facades.Route().Middleware(middleware.Auth()).Get("/users/profile", userController.GetProfile)
 
 	// @Group Polls
 	facades.Route().Middleware(middleware.Auth()).Get("/polls", pollsController.Index)

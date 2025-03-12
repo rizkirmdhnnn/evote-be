@@ -134,7 +134,7 @@ func (r *UserController) Update(ctx http.Context) http.Response {
 // @Failure 	400 {object} models.ErrorResponse "Validation error"
 // @Failure 	401 {object} models.ErrorResponse "Unauthorized"
 // @Router /users/avatar [post]
-// TODO: Compress image before storing
+// TODO: Compress image before storing |  limit file size
 func (r *UserController) UploadAvatar(ctx http.Context) http.Response {
 	// Get user from context
 	u, ok := ctx.Value("user").(models.User)
@@ -145,11 +145,29 @@ func (r *UserController) UploadAvatar(ctx http.Context) http.Response {
 		})
 	}
 
+	// Get file from request
 	file, err := ctx.Request().File("avatar")
 	if err != nil {
 		return ctx.Response().Json(http.StatusBadRequest, models.ErrorResponse{
 			Message: "Failed to upload avatar",
 			Errors:  err.Error(),
+		})
+	}
+
+	// Limit file size
+	size, err := file.Size()
+	if err != nil {
+		return ctx.Response().Json(http.StatusBadRequest, models.ErrorResponse{
+			Message: "Failed to upload avatar",
+			Errors:  err.Error(),
+		})
+	}
+
+	// Limit file size to 1MB
+	if size > 1024*1024 {
+		return ctx.Response().Json(http.StatusBadRequest, models.ErrorResponse{
+			Message: "Failed to upload avatar",
+			Errors:  "File size must not exceed 1MB",
 		})
 	}
 
@@ -208,6 +226,47 @@ func (r *UserController) UploadAvatar(ctx http.Context) http.Response {
 	// Return success response
 	return ctx.Response().Json(http.StatusCreated, models.ResponseWithData[models.UserRegisterResponse]{
 		Message: "avatar uploaded successfully",
+		Data: models.UserRegisterResponse{
+			ID:     int(user.ID),
+			Name:   user.Name,
+			Email:  user.Email,
+			Avatar: user.Avatar,
+		},
+	})
+}
+
+// Get Profile
+// @Summary Get Profile
+// @Description Get Profile
+// @Tags Users
+// @Accept json
+// @Produce json
+// @Security Bearer
+// @Success 	200 {object} models.ResponseWithData[models.UserRegisterResponse] "Success response"
+// @Failure 	401 {object} models.ErrorResponse "Unauthorized"
+// @Router /users/profile [get]
+func (r *UserController) GetProfile(ctx http.Context) http.Response {
+	// Get user from context
+	u, ok := ctx.Value("user").(models.User)
+	if !ok {
+		return ctx.Response().Json(http.StatusUnauthorized, models.ErrorResponse{
+			Message: "Unauthorized",
+			Errors:  "Invalid token",
+		})
+	}
+
+	// Get user data
+	var user models.User
+	if err := facades.Orm().Query().Model(&models.User{}).Where("id = ?", u.ID).First(&user); err != nil {
+		return ctx.Response().Json(http.StatusBadRequest, models.ErrorResponse{
+			Message: "Failed to get user profile",
+			Errors:  "User not found",
+		})
+	}
+
+	// Return success response
+	return ctx.Response().Json(http.StatusOK, models.ResponseWithData[models.UserRegisterResponse]{
+		Message: "user profile",
 		Data: models.UserRegisterResponse{
 			ID:     int(user.ID),
 			Name:   user.Name,

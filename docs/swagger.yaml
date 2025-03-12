@@ -735,6 +735,27 @@ paths:
       summary: Upload user avatar
       tags:
       - Users
+  /users/profile:
+    get:
+      consumes:
+      - application/json
+      description: Get Profile
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success response
+          schema:
+            $ref: '#/definitions/models.ResponseWithData-models_UserRegisterResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - Bearer: []
+      summary: Get Profile
+      tags:
+      - Users
   /users/update:
     put:
       consumes:
