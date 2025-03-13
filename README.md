@@ -47,3 +47,67 @@ A robust electronic voting system backend built with Goravel framework. This app
    ```bash
    git clone https://github.com/rizkirmdhn/evote-be.git
    cd evote-be
+   ```
+
+2. Copy the environment file and configure it:
+   ```bash
+   cp .env.example .env
+   ```
+   Update the `.env` file with your database, MinIO, and other configuration settings.
+
+3. Install dependencies:
+   ```bash
+   go mod tidy
+   ```
+
+4. Run database migrations:
+   ```bash
+   go run . artisan migrate
+   ```
+
+5. (Optional) Seed the database with sample data:
+   ```bash
+   go run . artisan db:seed
+   ```
+
+### Running the Application
+
+#### Development Mode
+
+```bash
+go run . 
+```
+
+The server will start at `http://localhost:3000`
+
+#### Using Docker
+
+1. Build and start the containers:
+   ```bash
+   docker-compose up -d
+   ```
+
+2. The application will be available at `http://localhost:3000`
+
+## API Documentation
+
+The API documentation is available through Swagger UI when the application is running:
+
+- Local development: `http://localhost:3000/swagger/index.html`
+
+
+## Contributing
+
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add some amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## Support
+
+If you encounter any issues or have questions, please [open an issue](https://github.com/rizkirmdhn/evote-be/issues).
