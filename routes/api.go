@@ -12,6 +12,7 @@ func Api() {
 	pollsController := controllers.NewPollsController()
 	optionController := controllers.NewOptionController()
 	userController := controllers.NewUserController()
+	voteController := controllers.NewVoteController()
 
 	// @Group Auth
 	facades.Route().Post("/auth/register", authController.Register)
@@ -36,4 +37,7 @@ func Api() {
 	facades.Route().Middleware(middleware.Auth()).Post("/options/create", optionController.Store)
 	facades.Route().Middleware(middleware.Auth()).Delete("/options/{id}/delete", optionController.Delete)
 	facades.Route().Middleware(middleware.Auth()).Put("/options/{id}/update", optionController.Update)
+
+	// @Group Votes
+	facades.Route().Middleware(middleware.Auth()).Post("/votes/create", voteController.Store)
 }

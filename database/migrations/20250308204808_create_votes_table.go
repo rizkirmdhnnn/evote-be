@@ -21,6 +21,7 @@ func (r *M20250308204808CreateVotesTable) Up() error {
 			table.UnsignedBigInteger("user_id")
 			table.UnsignedBigInteger("poll_id")
 			table.UnsignedBigInteger("option_id")
+			table.SoftDeletes()
 
 			table.Foreign("user_id").References("id").On("users")
 			table.Foreign("poll_id").References("id").On("polls")

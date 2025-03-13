@@ -9,5 +9,6 @@ type Votes struct {
 	UserID   uint
 	PollID   uint
 	OptionID uint
+	Polls    Polls `gorm:"foreignKey:PollID"`
 	orm.SoftDeletes
 }

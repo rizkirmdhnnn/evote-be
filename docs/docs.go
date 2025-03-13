@@ -858,6 +858,38 @@ const docTemplate = `{
                     }
                 }
             }
+        },
+        "/votes/create": {
+            "post": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "Record a vote for a poll option",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Vote"
+                ],
+                "summary": "Record a vote",
+                "parameters": [
+                    {
+                        "description": "Poll Data",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/requests.CreateVote"
+                        }
+                    }
+                ],
+                "responses": {}
+            }
         }
     },
     "definitions": {
@@ -1172,6 +1204,17 @@ const docTemplate = `{
                     ]
                 },
                 "title": {
+                    "type": "string"
+                }
+            }
+        },
+        "requests.CreateVote": {
+            "type": "object",
+            "properties": {
+                "option_id": {
+                    "type": "string"
+                },
+                "poll_id": {
                     "type": "string"
                 }
             }

@@ -209,6 +209,13 @@ definitions:
       title:
         type: string
     type: object
+  requests.CreateVote:
+    properties:
+      option_id:
+        type: string
+      poll_id:
+        type: string
+    type: object
   requests.UpdatePolling:
     properties:
       description:
@@ -788,6 +795,26 @@ paths:
       summary: Update user
       tags:
       - Users
+  /votes/create:
+    post:
+      consumes:
+      - application/json
+      description: Record a vote for a poll option
+      parameters:
+      - description: Poll Data
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/requests.CreateVote'
+      produces:
+      - application/json
+      responses: {}
+      security:
+      - Bearer: []
+      summary: Record a vote
+      tags:
+      - Vote
 securityDefinitions:
   Bearer:
     in: header
