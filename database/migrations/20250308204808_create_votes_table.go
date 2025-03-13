@@ -22,11 +22,16 @@ func (r *M20250308204808CreateVotesTable) Up() error {
 			table.UnsignedBigInteger("poll_id")
 			table.UnsignedBigInteger("option_id")
 			table.SoftDeletes()
+			table.Timestamps()
 
 			table.Foreign("user_id").References("id").On("users")
 			table.Foreign("poll_id").References("id").On("polls")
 			table.Foreign("option_id").References("id").On("options")
-			table.Timestamps()
+
+			// add index
+			table.Index("user_id")
+			table.Index("poll_id")
+			table.Index("option_id")
 		})
 	}
 

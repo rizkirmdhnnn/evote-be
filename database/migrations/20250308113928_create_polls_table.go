@@ -29,6 +29,10 @@ func (r *M20250308113928CreatePollsTable) Up() error {
 			table.BigInteger("user_id").Unsigned()
 
 			table.Foreign("user_id").References("id").On("users")
+			table.Index("user_id")
+			table.Index("code")
+
+			table.Unique("code")
 		})
 	}
 

@@ -25,7 +25,9 @@ func (r *M20250308204957CreateOptionsTable) Up() error {
 			table.UnsignedBigInteger("votes_count").Default(0)
 			table.Timestamps()
 			table.SoftDeletes()
+
 			table.Foreign("poll_id").References("id").On("polls").CascadeOnDelete()
+			table.Index("poll_id")
 		})
 	}
 
