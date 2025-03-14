@@ -40,7 +40,10 @@ func (r *UpdateOption) Attributes(ctx http.Context) map[string]string {
 }
 
 func (r *UpdateOption) PrepareForValidation(ctx http.Context, data validation.Data) error {
-	v, _ := data.Get("poll_id")
-	r.PollID = v.(string)
+	value, isExists := data.Get("poll_id")
+	if !isExists {
+		return nil
+	}
+	r.PollID = value.(string)
 	return nil
 }
