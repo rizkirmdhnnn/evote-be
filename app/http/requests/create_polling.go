@@ -2,6 +2,7 @@ package requests
 
 import (
 	"errors"
+	"fmt"
 	"time"
 
 	"github.com/goravel/framework/contracts/http"
@@ -9,14 +10,14 @@ import (
 )
 
 type CreatePolling struct {
-	Title       string    `json:"title"`
-	Description string    `json:"description"`
-	StartDate   time.Time `json:"start_date" swaggertype:"string" example:"2022-01-01 00:00" format:"date-time"`
-	EndDate     time.Time `json:"end_date" swaggertype:"string" example:"2022-01-01 00:00" format:"date-time"`
+	Title       string     `json:"title"`
+	Description string     `json:"description"`
+	StartDate   *time.Time `json:"start_date" swaggertype:"string" example:"2022-01-01 00:00" format:"date-time"`
+	EndDate     time.Time  `json:"end_date" swaggertype:"string" example:"2022-01-01 00:00" format:"date-time"`
 	// testing:
 	// * active - Active, can be voted
 	// * done - Done, can't be voted
-	Status string `json:"status" swaggertype:"string" enums:"active,done"`
+	Status string `json:"status" swaggertype:"string" enums:"active,done,scheduled"`
 }
 
 func (r *CreatePolling) Authorize(ctx http.Context) error {
@@ -31,9 +32,7 @@ func (r *CreatePolling) Rules(ctx http.Context) map[string]string {
 	return map[string]string{
 		"title":       "required|string",
 		"description": "required|string",
-		"start_date":  "required|date",
 		"end_date":    "required|date",
-		"status":      "in:active,done",
 	}
 }
 
@@ -46,42 +45,48 @@ func (r *CreatePolling) Attributes(ctx http.Context) map[string]string {
 }
 
 func (r *CreatePolling) PrepareForValidation(ctx http.Context, data validation.Data) error {
-	localNow := time.Now()
+	// Dapatkan waktu lokal saat ini
+	localNow := time.Now().Truncate(time.Minute)
 
-	// Check if start_date and end_date are provided
+	// Parse tanggal dari string
+	layout := "2006-01-02 15:04"
 	startDateStr, exists := data.Get("start_date")
 	if !exists {
-		return errors.New("start_date is required")
+		startDateStr = localNow.Format(layout)
 	}
 	endDateStr, exists := data.Get("end_date")
 	if !exists {
 		return errors.New("end_date is required")
 	}
 
-	// Parse start_date and end_date without changing timezone
-	layout := "2006-01-02 15:04"
-	startDate, err := time.Parse(layout, startDateStr.(string))
+	// Parse dengan zona waktu yang sama
+	startDate, err := time.ParseInLocation(layout, startDateStr.(string), localNow.Location())
 	if err != nil {
-		return errors.New("invalid start_date format, use RFC3339 format")
+		return errors.New("invalid start_date format, use YYYY-MM-DD HH:MM format")
 	}
 
-	endDate, err := time.Parse(layout, endDateStr.(string))
+	endDate, err := time.ParseInLocation(layout, endDateStr.(string), localNow.Location())
 	if err != nil {
-		return errors.New("invalid end_date format, use RFC3339 format")
+		return errors.New("invalid end_date format, use YYYY-MM-DD HH:MM format")
 	}
 
-	// Store parsed times to struct
-	r.StartDate = startDate
+	// Simpan ke struct
+	r.StartDate = &startDate
 	r.EndDate = endDate
 
-	// Check if start_date is after end_date
-	if startDate.After(endDate) {
-		return errors.New("invalid start_date, must be before end_date")
+	// Debug
+	fmt.Println("Local Now:", localNow)
+	fmt.Println("Start Date:", startDate)
+	fmt.Println("End Date:", endDate)
+
+	// Validasi tanggal mulai harus di masa depan
+	if startDate.Before(localNow) {
+		return errors.New("invalid start_date, must be in the future")
 	}
 
-	// Check if start_date is in the future
-	if !startDate.After(localNow) {
-		return errors.New("invalid start_date, must be in the future")
+	// Validasi tanggal mulai harus sebelum tanggal selesai
+	if startDate.After(endDate) || startDate.Equal(endDate) {
+		return errors.New("invalid date range, start_date must be before end_date")
 	}
 
 	return nil

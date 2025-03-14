@@ -129,12 +129,21 @@ func (r *PollsController) Store(ctx http.Context) http.Response {
 		})
 	}
 
+	if request.StartDate.Equal(time.Now().Truncate(time.Minute)) {
+		request.Status = string(models.Active)
+	}
+
+	if request.StartDate.After(time.Now().Truncate(time.Minute)) {
+		request.Status = string(models.Scheduled)
+	}
+
 	// create poll object
 	poll := models.Polls{
+		Code:        nil,
 		Title:       request.Title,
 		Description: request.Description,
-		Status:      models.Active,
-		StartDate:   request.StartDate,
+		Status:      models.Status(request.Status),
+		StartDate:   *request.StartDate,
 		EndDate:     request.EndDate,
 		UserID:      user.ID,
 	}
@@ -154,7 +163,7 @@ func (r *PollsController) Store(ctx http.Context) http.Response {
 			ID:          int(poll.ID),
 			Title:       poll.Title,
 			Description: poll.Description,
-			Status:      models.Active,
+			Status:      poll.Status,
 			StartDate:   poll.StartDate,
 			EndDate:     poll.EndDate,
 		},
@@ -528,7 +537,7 @@ func (r *PollsController) GeneratePublicPollCode(ctx http.Context) http.Response
 	}
 
 	// Generate public code
-	if poll.Code != "" {
+	if poll.Code != nil {
 		return ctx.Response().Json(http.StatusOK, models.ResponseWithData[models.PollsResponse]{
 			Message: "Poll code already generated",
 			Data:    poll.ToResponse(),
@@ -537,7 +546,7 @@ func (r *PollsController) GeneratePublicPollCode(ctx http.Context) http.Response
 	code := randomString(6)
 
 	// Update poll with code
-	poll.Code = code
+	poll.Code = &code
 	if err := facades.Orm().Query().Save(&poll); err != nil {
 		return ctx.Response().Json(http.StatusInternalServerError, models.ErrorResponse{
 			Message: "Failed to generate code",

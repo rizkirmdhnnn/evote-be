@@ -10,8 +10,9 @@ import (
 type Status string
 
 const (
-	Active Status = "active"
-	Done   Status = "done"
+	Active    Status = "active"
+	Done      Status = "done"
+	Scheduled Status = "Scheduled"
 )
 
 type Polls struct {
@@ -21,7 +22,7 @@ type Polls struct {
 	Status      Status
 	StartDate   time.Time
 	EndDate     time.Time
-	Code        string
+	Code        *string
 	UserID      uint
 	Options     []*Options `gorm:"foreignKey:PollID"`
 	Votes       []*Votes   `gorm:"foreignKey:PollID"`
@@ -77,7 +78,7 @@ func (p *Polls) ToResponse() PollsResponse {
 		Status:      p.Status,
 		StartDate:   p.StartDate.String(),
 		EndDate:     p.EndDate.String(),
-		Code:        p.Code,
+		Code:        *p.Code,
 	}
 }
 
@@ -93,7 +94,7 @@ func (p *Polls) ToPublicResponse() PublicPollsResponse {
 		Status:      p.Status,
 		StartDate:   p.StartDate,
 		EndDate:     p.EndDate,
-		Code:        p.Code,
+		Code:        *p.Code,
 		Options:     options,
 	}
 }
