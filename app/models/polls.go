@@ -10,8 +10,8 @@ import (
 type Status string
 
 const (
-	Active    Status = "active"
-	Done      Status = "done"
+	Active    Status = "Active"
+	Done      Status = "Done"
 	Scheduled Status = "Scheduled"
 )
 

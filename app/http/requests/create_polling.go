@@ -17,7 +17,7 @@ type CreatePolling struct {
 	// testing:
 	// * active - Active, can be voted
 	// * done - Done, can't be voted
-	Status string `json:"status" swaggertype:"string" enums:"active,done,scheduled"`
+	Status string `json:"status" swaggertype:"string" enums:"Active,Done,Scheduled"`
 }
 
 func (r *CreatePolling) Authorize(ctx http.Context) error {
