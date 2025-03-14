@@ -211,9 +211,9 @@ definitions:
     type: object
   requests.CreateVote:
     properties:
-      option_id:
+      code:
         type: string
-      poll_id:
+      option_id:
         type: string
     type: object
   requests.UpdatePolling:

@@ -1211,10 +1211,10 @@ const docTemplate = `{
         "requests.CreateVote": {
             "type": "object",
             "properties": {
-                "option_id": {
+                "code": {
                     "type": "string"
                 },
-                "poll_id": {
+                "option_id": {
                     "type": "string"
                 }
             }
