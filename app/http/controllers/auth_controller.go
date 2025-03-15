@@ -3,6 +3,7 @@ package controllers
 import (
 	"errors"
 	"evote-be/app/http/requests"
+	"evote-be/app/mails"
 	"evote-be/app/models"
 
 	"github.com/goravel/framework/contracts/http"
@@ -93,6 +94,16 @@ func (r *AuthController) Register(ctx http.Context) http.Response {
 			Errors:  err.Error(),
 		})
 	}
+
+	// Send email
+	err = facades.Mail().Queue(mails.NewUserRegister(user.Email, user.VerificationToken))
+	if err != nil {
+		return ctx.Response().Json(http.StatusInternalServerError, models.ErrorResponse{
+			Message: "ups, something went wrong",
+			Errors:  err.Error(),
+		})
+	}
+	//
 
 	// Return success response
 	return ctx.Response().Json(http.StatusCreated, models.ResponseWithData[models.UserRegisterResponse]{

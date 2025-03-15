@@ -28,9 +28,12 @@ func main() {
 	// Start schedule by facades.Schedule
 	go facades.Schedule().Run()
 
-	// Create a channel to listen for OS signals
-	quit := make(chan os.Signal)
-	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
+	// Start queue worker by facades.Queue()
+	go func() {
+		if err := facades.Queue().Worker().Run(); err != nil {
+			facades.Log().Errorf("Queue run error: %v", err)
+		}
+	}()
 
 	// Start http server by facades.Route().
 	go func() {
@@ -38,6 +41,10 @@ func main() {
 			facades.Log().Errorf("Route Run error: %v", err)
 		}
 	}()
+
+	// Create a channel to listen for OS signals
+	quit := make(chan os.Signal)
+	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
 
 	// Listen for the OS signal
 	go func() {
