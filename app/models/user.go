@@ -1,16 +1,20 @@
 package models
 
 import (
+	"time"
+
 	"github.com/goravel/framework/database/orm"
 )
 
 type User struct {
 	orm.Model
-	Name     string
-	Email    string
-	Password string
-	Avatar   string
-	Polls    []*Polls
+	Name              string
+	Email             string
+	Password          string
+	Avatar            string
+	EmailVerifiedAt   *time.Time
+	VerificationToken string
+	Polls             []*Polls
 	orm.SoftDeletes
 }
 

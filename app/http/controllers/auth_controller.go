@@ -68,9 +68,10 @@ func (r *AuthController) Register(ctx http.Context) http.Response {
 
 	// Create user
 	user := models.User{
-		Name:     req.Name,
-		Email:    req.Email,
-		Password: hashedPass,
+		Name:              req.Name,
+		Email:             req.Email,
+		Password:          hashedPass,
+		VerificationToken: randomString(32),
 	}
 
 	// Save user
