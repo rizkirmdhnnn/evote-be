@@ -40,13 +40,13 @@ type CreatePollingResponse struct {
 }
 
 type PollsResponse struct {
-	ID          int    `json:"id"`
-	Title       string `json:"title"`
-	Description string `json:"description"`
-	Status      Status
-	StartDate   string `json:"start_date"`
-	EndDate     string `json:"end_date"`
-	Code        string `json:"code"`
+	ID          int     `json:"id"`
+	Title       string  `json:"title"`
+	Description string  `json:"description"`
+	Status      Status  `json:"status"`
+	StartDate   string  `json:"start_date"`
+	EndDate     string  `json:"end_date"`
+	Code        *string `json:"code,omitempty"`
 }
 
 type UpdatePollingResponse struct {
@@ -66,7 +66,7 @@ type PublicPollsResponse struct {
 	Status      Status                  `json:"status"`
 	StartDate   time.Time               `json:"start_date"`
 	EndDate     time.Time               `json:"end_date"`
-	Code        string                  `json:"code"`
+	Code        *string                 `json:"code,omitempty"`
 	Options     []CreateOptionsResponse `json:"options,omitempty"`
 }
 
@@ -78,7 +78,7 @@ func (p *Polls) ToResponse() PollsResponse {
 		Status:      p.Status,
 		StartDate:   p.StartDate.String(),
 		EndDate:     p.EndDate.String(),
-		Code:        *p.Code,
+		Code:        p.Code,
 	}
 }
 
@@ -94,7 +94,7 @@ func (p *Polls) ToPublicResponse() PublicPollsResponse {
 		Status:      p.Status,
 		StartDate:   p.StartDate,
 		EndDate:     p.EndDate,
-		Code:        *p.Code,
+		Code:        p.Code,
 		Options:     options,
 	}
 }

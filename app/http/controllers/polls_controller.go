@@ -3,7 +3,6 @@ package controllers
 import (
 	"evote-be/app/http/requests"
 	"evote-be/app/models"
-	"fmt"
 	"math"
 	"math/rand"
 	"strconv"
@@ -54,7 +53,7 @@ func (r *PollsController) Index(ctx http.Context) http.Response {
 	// Get polls with optimized query
 	var polls []models.Polls
 	query := facades.Orm().Query().Model(&models.Polls{}).Where("user_id", user.ID).OrderBy("id", "desc")
-	if err := query.Limit(limit).Offset(offset).Select("id", "title", "description", "status", "start_date", "end_date").Find(&polls); err != nil {
+	if err := query.Limit(limit).Offset(offset).Select("id", "title", "description", "status", "start_date", "end_date", "code").Find(&polls); err != nil {
 		return ctx.Response().Json(http.StatusInternalServerError, models.ErrorResponse{
 			Message: "Oops, something went wrong",
 			Errors:  err.Error(),
@@ -516,7 +515,6 @@ func (r *PollsController) GetPublicPolls(ctx http.Context) http.Response {
 func (r *PollsController) GeneratePublicPollCode(ctx http.Context) http.Response {
 	// Get user from context
 	user, ok := ctx.Value("user").(models.User)
-	fmt.Sprintf("user: %v", user)
 	if !ok {
 		return ctx.Response().Json(http.StatusUnauthorized, models.ErrorResponse{
 			Message: "Unauthorized",
