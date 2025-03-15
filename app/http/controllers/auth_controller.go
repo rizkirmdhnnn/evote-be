@@ -165,6 +165,14 @@ func (r *AuthController) Login(ctx http.Context) http.Response {
 		})
 	}
 
+	// Check if user is verified
+	if user.EmailVerifiedAt == nil {
+		return ctx.Response().Json(http.StatusUnauthorized, models.ErrorResponse{
+			Message: "please verify your email address",
+			Errors:  http.Json{"email": "email not verified"},
+		})
+	}
+
 	// Generate token
 	token, err := facades.Auth(ctx).LoginUsingID(user.ID)
 	if err != nil {
