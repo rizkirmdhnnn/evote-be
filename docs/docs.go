@@ -116,6 +116,38 @@ const docTemplate = `{
                 }
             }
         },
+        "/auth/verify/{token}": {
+            "get": {
+                "description": "Verify user email address and return an HTML page",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "text/html"
+                ],
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Verify email",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Verification Token",
+                        "name": "token",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "HTML content (success or error message)",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
         "/options/create": {
             "post": {
                 "security": [
@@ -1108,12 +1140,14 @@ const docTemplate = `{
         "models.Status": {
             "type": "string",
             "enum": [
-                "active",
-                "done"
+                "Active",
+                "Done",
+                "Scheduled"
             ],
             "x-enum-varnames": [
                 "Active",
-                "Done"
+                "Done",
+                "Scheduled"
             ]
         },
         "models.UpdatePollingResponse": {
@@ -1199,8 +1233,9 @@ const docTemplate = `{
                     "description": "testing:\n* active - Active, can be voted\n* done - Done, can't be voted",
                     "type": "string",
                     "enum": [
-                        "active",
-                        "done"
+                        "Active",
+                        "Done",
+                        "Scheduled"
                     ]
                 },
                 "title": {

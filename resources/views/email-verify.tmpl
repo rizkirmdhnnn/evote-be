@@ -1,0 +1,27 @@
+{{ define "email-verify.tmpl" }}
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Account Verification</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 flex items-center justify-center min-h-screen">
+    <div class="bg-white p-8 rounded-lg shadow-lg w-full max-w-md text-center">
+        {{ if .success }}
+            <div class="flex justify-center mb-4">
+                <svg class="w-16 h-16 text-green-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path></svg>
+            </div>
+            <h1 class="text-2xl font-bold text-green-600">Verification Successful!</h1>
+            <p class="text-gray-700 mt-2">{{.message}}</p>
+        {{ else }}
+            <div class="flex justify-center mb-4">
+                <svg class="w-16 h-16 text-red-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path></svg>
+            </div>
+            <h1 class="text-2xl font-bold text-red-600">Verification Failed</h1>
+            <p class="text-gray-700 mt-2">{{.message}}</p>
+        {{ end }}
+    </div>
+</body>
+</html>
+{{ end }}

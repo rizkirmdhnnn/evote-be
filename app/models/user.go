@@ -1,8 +1,6 @@
 package models
 
 import (
-	"time"
-
 	"github.com/goravel/framework/database/orm"
 )
 
@@ -12,7 +10,7 @@ type User struct {
 	Email             string
 	Password          string
 	Avatar            string
-	EmailVerifiedAt   *time.Time
+	EmailVerifiedAt  string
 	VerificationToken string
 	Polls             []*Polls
 	orm.SoftDeletes

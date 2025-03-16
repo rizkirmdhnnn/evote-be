@@ -5,6 +5,8 @@ import (
 	"evote-be/app/http/requests"
 	"evote-be/app/mails"
 	"evote-be/app/models"
+	"fmt"
+	"time"
 
 	"github.com/goravel/framework/contracts/http"
 	"github.com/goravel/framework/facades"
@@ -149,8 +151,9 @@ func (r *AuthController) Login(ctx http.Context) http.Response {
 	}
 
 	// Find user by email
-	user := models.User{}
-	if err := facades.Orm().Query().Where("email", req.Email).First(&user); err != nil {
+	var user models.User
+	if err := facades.Orm().Query().Where("email = ?", req.Email).FirstOrFail(&user); err != nil {
+		fmt.Print(err)
 		return ctx.Response().Json(http.StatusUnauthorized, models.ErrorResponse{
 			Message: "ups, something went wrong",
 			Errors:  http.Json{"email": "email not found"},
@@ -166,7 +169,7 @@ func (r *AuthController) Login(ctx http.Context) http.Response {
 	}
 
 	// Check if user is verified
-	if user.EmailVerifiedAt == nil {
+	if user.EmailVerifiedAt == "" {
 		return ctx.Response().Json(http.StatusUnauthorized, models.ErrorResponse{
 			Message: "please verify your email address",
 			Errors:  http.Json{"email": "email not verified"},
@@ -192,5 +195,55 @@ func (r *AuthController) Login(ctx http.Context) http.Response {
 			Avatar: user.Avatar,
 			Token:  token,
 		},
+	})
+}
+
+// @Summary     Verify email
+// @Description Verify user email address and return an HTML page
+// @Tags        Auth
+// @Accept      json
+// @Produce     text/html
+// @Param       token path string true "Verification Token from email"
+// @Success     200 {string} string "HTML content (success or error message)"
+// @Router      /auth/verify/{token} [get]
+func (r *AuthController) Verify(ctx http.Context) http.Response {
+	// Get token from path
+	token := ctx.Request().Route("token")
+
+	// Find user by token
+	var user models.User
+	if err := facades.Orm().Query().Where("verification_token", token).FirstOrFail(&user); err != nil {
+		return ctx.Response().View().Make("email-verify.tmpl", map[string]any{
+			"success": false,
+			"message": "The verification link has expired or is invalid. Please request a new one",
+		})
+
+	}
+
+	// Check if user email already verified
+	if user.EmailVerifiedAt != "" {
+		return ctx.Response().View().Make("email-verify.tmpl", map[string]any{
+			"status":  false,
+			"message": "Your account has been already verified.",
+		})
+
+	}
+
+	// Update user email verified at
+	now := time.Now().Truncate(time.Minute)
+	layout := "2006-01-02 15:04:05"
+	user.EmailVerifiedAt = now.Format(layout)
+
+	// Save user
+	if err := facades.Orm().Query().Save(&user); err != nil {
+		return ctx.Response().View().Make("email-verify.tmpl", map[string]any{
+			"success": false,
+			"message": "Oops! Something went wrong. Please try again.",
+		})
+	}
+
+	return ctx.Response().View().Make("email-verify.tmpl", map[string]any{
+		"success": true,
+		"message": "Your account has been successfully verified. Welcome aboard! 🎉",
 	})
 }

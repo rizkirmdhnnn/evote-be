@@ -138,12 +138,14 @@ definitions:
     type: object
   models.Status:
     enum:
-    - active
-    - done
+    - Active
+    - Done
+    - Scheduled
     type: string
     x-enum-varnames:
     - Active
     - Done
+    - Scheduled
   models.UpdatePollingResponse:
     properties:
       code:
@@ -203,8 +205,9 @@ definitions:
           * active - Active, can be voted
           * done - Done, can't be voted
         enum:
-        - active
-        - done
+        - Active
+        - Done
+        - Scheduled
         type: string
       title:
         type: string
@@ -323,6 +326,27 @@ paths:
           schema:
             $ref: '#/definitions/models.ErrorResponse'
       summary: Register new user
+      tags:
+      - Auth
+  /auth/verify/{token}:
+    get:
+      consumes:
+      - application/json
+      description: Verify user email address and return an HTML page
+      parameters:
+      - description: Verification Token
+        in: path
+        name: token
+        required: true
+        type: string
+      produces:
+      - text/html
+      responses:
+        "200":
+          description: HTML content (success or error message)
+          schema:
+            type: string
+      summary: Verify email
       tags:
       - Auth
   /options/{id}/delete:

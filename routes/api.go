@@ -17,6 +17,7 @@ func Api() {
 	// @Group Auth
 	facades.Route().Post("/auth/register", authController.Register)
 	facades.Route().Post("/auth/login", authController.Login)
+	facades.Route().Get("/auth/verify/{token}", authController.Verify)
 
 	// @Group Users
 	facades.Route().Middleware(middleware.Auth()).Put("/users/update", userController.Update)
