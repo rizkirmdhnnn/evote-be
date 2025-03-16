@@ -75,7 +75,7 @@ func (r *AuthController) Register(ctx http.Context) http.Response {
 		Email:             req.Email,
 		Password:          hashedPass,
 		VerificationToken: randomString(32),
-		TokenExpiresAt:    time.Now().Truncate(time.Minute).Add(time.Minute * 1).Format("2006-01-02 15:04"),
+		TokenExpiresAt:    time.Now().Truncate(time.Minute).Add(time.Minute * 10).Format("2006-01-02 15:04"),
 	}
 
 	// Save user
@@ -98,8 +98,11 @@ func (r *AuthController) Register(ctx http.Context) http.Response {
 		})
 	}
 
+	// Link for email verification
+	link := fmt.Sprintf("%s/auth/verify/%s", facades.Config().GetString("APP_URL", "http://localhost:3000"), user.VerificationToken)
+
 	// Send email
-	err = facades.Mail().Queue(mails.NewUserRegister(user.Email, user.VerificationToken))
+	err = facades.Mail().Queue(mails.NewUserRegister(user.Email, link))
 	if err != nil {
 		return ctx.Response().Json(http.StatusInternalServerError, models.ErrorResponse{
 			Message: "ups, something went wrong",
@@ -231,10 +234,11 @@ func (r *AuthController) Verify(ctx http.Context) http.Response {
 	}
 
 	// Define time layout
-	layout := "2006-01-02 15:04:05"
+	layout := "2006-01-02 15:04"
 
 	// Check if token is expired
 	tokenExpiresAt, err := time.Parse(layout, user.TokenExpiresAt)
+	fmt.Println(err)
 	if err != nil || time.Now().After(tokenExpiresAt) {
 		return ctx.Response().View().Make("email-verify.tmpl", map[string]any{
 			"success": false,
