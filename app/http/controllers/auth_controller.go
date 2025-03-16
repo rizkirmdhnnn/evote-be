@@ -75,6 +75,7 @@ func (r *AuthController) Register(ctx http.Context) http.Response {
 		Email:             req.Email,
 		Password:          hashedPass,
 		VerificationToken: randomString(32),
+		TokenExpiresAt:    time.Now().Truncate(time.Minute).Add(time.Minute * 1).Format("2006-01-02 15:04"),
 	}
 
 	// Save user
@@ -229,9 +230,20 @@ func (r *AuthController) Verify(ctx http.Context) http.Response {
 
 	}
 
+	// Define time layout
+	layout := "2006-01-02 15:04:05"
+
+	// Check if token is expired
+	tokenExpiresAt, err := time.Parse(layout, user.TokenExpiresAt)
+	if err != nil || time.Now().After(tokenExpiresAt) {
+		return ctx.Response().View().Make("email-verify.tmpl", map[string]any{
+			"success": false,
+			"message": "The verification link has expired or is invalid. Please request a new one",
+		})
+	}
+
 	// Update user email verified at
 	now := time.Now().Truncate(time.Minute)
-	layout := "2006-01-02 15:04:05"
 	user.EmailVerifiedAt = now.Format(layout)
 
 	// Save user

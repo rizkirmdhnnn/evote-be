@@ -10,8 +10,9 @@ type User struct {
 	Email             string
 	Password          string
 	Avatar            string
-	EmailVerifiedAt  string
+	EmailVerifiedAt   string
 	VerificationToken string
+	TokenExpiresAt    string
 	Polls             []*Polls
 	orm.SoftDeletes
 }

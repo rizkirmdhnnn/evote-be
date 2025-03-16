@@ -23,6 +23,7 @@ func (r *M20240915060148CreateUsersTable) Up() error {
 		table.String("avatar").Default("")
 		table.String("email_verified_at").Nullable()
 		table.String("verification_token").Nullable()
+		table.String("token_expires_at").Nullable()
 		table.Timestamps()
 		table.SoftDeletes()
 
